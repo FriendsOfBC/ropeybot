@@ -12,8 +12,8 @@ importers:
         specifier: link:src
         version: link:src
       bc-stubs:
-        specifier: ^116.0.0
-        version: 116.0.0
+        specifier: 117.0.0-Beta.1
+        version: 117.0.0-Beta.1
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -360,8 +360,8 @@ packages:
   '@types/whatwg-url@11.0.5':
     resolution: {integrity: sha512-coYR071JRaHa+xoEvvYqvnIHaVqaYrLPbsufM9BF63HkwI5Lgmy2QR8Q5K/lYDYo5AK82wOvSOS0UsLTpTG7uQ==}
 
-  bc-stubs@116.0.0:
-    resolution: {integrity: sha512-70iudcyWi2MacZR0W8LCQegDkgBIjiEoyBe2NuTM2Nvj6/p6MT1M80byOSc1CpBeIdSurkJw8RUFqrTL/mXU6Q==}
+  bc-stubs@117.0.0-Beta.1:
+    resolution: {integrity: sha512-sX0fHJY0h6H1a89QAD2oY8uAa2apTkbXaC4xU0LGmUpKcVdlSMjz3V+SO8iH+N9HbM2ev3mhiO5YC2GjTV/cbw==}
 
   bintrees@1.0.2:
     resolution: {integrity: sha512-VOMgTMwjAaUG580SXn3LacVgjurrbMme7ZZNYGSSV7mmtY6QQRh0Eg3pwIcntQ77DErK1L0NxkbetjcoXzVwKw==}
@@ -684,7 +684,7 @@ snapshots:
     dependencies:
       '@types/webidl-conversions': 7.0.3
 
-  bc-stubs@116.0.0:
+  bc-stubs@117.0.0-Beta.1:
     dependencies:
       socket.io-client: 4.6.1
     transitivePeerDependencies:

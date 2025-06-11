@@ -10,7 +10,7 @@
         "compile": "rm -rf dist/* && tsc -p tsconfig.json"
     },
     "dependencies": {
-        "bc-stubs": "^116.0.0",
+        "bc-stubs": "117.0.0-Beta.1",
         "lz-string": "^1.5.0",
         "prettier": "^3.5.3",
         "socket.io-client": "^4.8.1"

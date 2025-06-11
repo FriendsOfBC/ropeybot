@@ -10,7 +10,7 @@
     },
     "dependencies": {
         "bc-bot": "link:src",
-        "bc-stubs": "^116.0.0",
+        "bc-stubs": "117.0.0-Beta.1",
         "lodash": "^4.17.21",
         "lz-string": "^1.5.0",
         "mongodb": "^6.16.0",

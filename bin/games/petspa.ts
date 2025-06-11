@@ -13,7 +13,7 @@
  */
 
 import { decompressFromBase64 } from "lz-string";
-import { API_Connector, CoordObject, MessageEvent, makeDoorRegion, MapRegion, API_Character, AssetGet, BC_AppearanceItem, CommandParser, BC_Server_ChatRoomMessage } from "bc-bot";
+import { API_Connector, MessageEvent, makeDoorRegion, MapRegion, API_Character, AssetGet, BC_AppearanceItem, CommandParser, BC_Server_ChatRoomMessage } from "bc-bot";
 import { remainingTimeString } from "../utils";
 import { wait } from "../hub/utils";
 
@@ -24,16 +24,16 @@ const RECEPTION_AREA: MapRegion = {
 
 const RECEPTIONIST_POSITION = { X: 22, Y: 11 };
 
-const EXHIBIT_1: CoordObject = { X: 26, Y: 12 };
-const EXHIBIT_2: CoordObject = { X: 28, Y: 12 };
-const EXHIBIT_3: CoordObject = { X: 30, Y: 12 };
-const EXHIBIT_4: CoordObject = { X: 32, Y: 12 };
+const EXHIBIT_1: ChatRoomMapPos = { X: 26, Y: 12 };
+const EXHIBIT_2: ChatRoomMapPos = { X: 28, Y: 12 };
+const EXHIBIT_3: ChatRoomMapPos = { X: 30, Y: 12 };
+const EXHIBIT_4: ChatRoomMapPos = { X: 32, Y: 12 };
 
-const HALLWAY_TO_PET_AREA_DOOR: CoordObject = { X: 18, Y: 2 };
-const COMMON_AREA_TO_RECEPTION_DOOR: CoordObject = { X: 14, Y: 10 };
-const REDRESSING_PAD: CoordObject = { X: 18, Y: 8 };
+const HALLWAY_TO_PET_AREA_DOOR: ChatRoomMapPos = { X: 18, Y: 2 };
+const COMMON_AREA_TO_RECEPTION_DOOR: ChatRoomMapPos = { X: 14, Y: 10 };
+const REDRESSING_PAD: ChatRoomMapPos = { X: 18, Y: 8 };
 
-const DRESSING_PAD: CoordObject = { X: 23, Y: 5 };
+const DRESSING_PAD: ChatRoomMapPos = { X: 23, Y: 5 };
 
 const MAP =
     "N4IgKgngDgpiBcICCAbA7gQwgZxAGnAEsUZdEAgyq6m8wH+AAPJ5hugEw86+9t6sZZN23EZz586kyc2GiR4hfRlzRi8QNYr5a3gIDBsrRyknTZqcqNWjGw9fsc9bWw9dcXbroAXwHz/NnPb18vO25/EytgkJsAEL04hPjQkSjkrhiMzKy0oN8c4yzC/I5U2MLMu0An4Grq8hr6hsam+oB1tvaOzrbKroAz/q6unsGRluGO/t7R9vHpjtm2ybmx5c6FlqW59a29Xb39g8PKg+Xjw/Pzs73Ti9v9q92bu7uHvSfni9f3j6OTnZ/Ln8Wr4hgDAft2iC1mDfhC2lD5jCDl94T5QUi9ijpq8YVjRjiwXiRgSAUTBiSfmT0Ri9FToTTaUD8QzGXDsSzXvgQAB5ABGACsYABjAAuZBAgUlHEo2hlUu00vIRkANfDyrhytWarXayWAKvgdQbPIAxoCNhocgC4gS2Wg3ULSAavgRA6zdZAEPQbDdHsNACXnb63IABQD9QZUTuDYZ1gA/wDiAIAhwyIo1psHGzYBV8F9CeToljmaD2edgAYgDiALfAc8G0/GM37KwbC3Jq8766Wq2HGy2462DR2G5wu54uQAxAD2AHMEAAzDAobAwAC+QA";

@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       bc-stubs:
-        specifier: ^116.0.0
-        version: 116.0.0
+        specifier: 117.0.0-Beta.1
+        version: 117.0.0-Beta.1
       lz-string:
         specifier: ^1.5.0
         version: 1.5.0
@@ -336,8 +336,8 @@ packages:
   '@types/node@20.17.57':
     resolution: {integrity: sha512-f3T4y6VU4fVQDKVqJV4Uppy8c1p/sVvS3peyqxyWnzkqXFJLRU7Y1Bl7rMS1Qe9z0v4M6McY0Fp9yBsgHJUsWQ==}
 
-  bc-stubs@116.0.0:
-    resolution: {integrity: sha512-70iudcyWi2MacZR0W8LCQegDkgBIjiEoyBe2NuTM2Nvj6/p6MT1M80byOSc1CpBeIdSurkJw8RUFqrTL/mXU6Q==}
+  bc-stubs@117.0.0-Beta.1:
+    resolution: {integrity: sha512-sX0fHJY0h6H1a89QAD2oY8uAa2apTkbXaC4xU0LGmUpKcVdlSMjz3V+SO8iH+N9HbM2ev3mhiO5YC2GjTV/cbw==}
 
   debug@4.3.7:
     resolution: {integrity: sha512-Er2nc/H7RrMXZBFCEim6TCmMk02Z8vLC2Rbi1KEBggpo0fS6l0S1nnapwmIi3yW/+GOJap1Krg4w0Hg80oCqgQ==}
@@ -606,7 +606,7 @@ snapshots:
     dependencies:
       undici-types: 6.19.8
 
-  bc-stubs@116.0.0:
+  bc-stubs@117.0.0-Beta.1:
     dependencies:
       socket.io-client: 4.6.1
     transitivePeerDependencies:

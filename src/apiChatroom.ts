@@ -14,7 +14,7 @@
 
 import { EventEmitter } from "stream";
 import { API_Character, API_Character_Data } from "./apiCharacter";
-import { API_Connector, CoordObject, SingleItemUpdate } from "./apiConnector";
+import { API_Connector, SingleItemUpdate } from "./apiConnector";
 import { API_Map } from "./apiMap";
 import { API_AppearanceItem } from "./item";
 
@@ -236,7 +236,7 @@ export class API_Chatroom extends EventEmitter<ChatRoomEvents> {
         }
     }
 
-    public mapPositionUpdate(memberNumber: number, mapData: CoordObject) {
+    public mapPositionUpdate(memberNumber: number, mapData: ChatRoomMapPos) {
         const charData = this.data.Character.find(
             (x) => x.MemberNumber === memberNumber,
         );

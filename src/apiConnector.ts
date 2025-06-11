@@ -60,14 +60,9 @@ export interface SyncItemPayload {
     Item: SingleItemUpdate;
 }
 
-export interface CoordObject {
-    X: number;
-    Y: number;
-}
-
 export interface SyncMapDataPayload {
     MemberNumber: number;
-    MapData: CoordObject;
+    MapData: ChatRoomMapData;
 }
 
 // What the bot advertises as its game version
@@ -531,7 +526,7 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
 
     private onChatRoomSyncMapData = (update: SyncMapDataPayload) => {
         console.log("chat room map data", update);
-        this._chatRoom.mapPositionUpdate(update.MemberNumber, update.MapData);
+        this._chatRoom.mapPositionUpdate(update.MemberNumber, update.MapData.Pos);
     };
 
     private onChatRoomMessage = (msg: BC_Server_ChatRoomMessage) => {
@@ -817,8 +812,11 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
 
     public moveOnMap(x: number, y: number): void {
         this.wrappedSock.emit("ChatRoomCharacterMapDataUpdate", {
-            X: x,
-            Y: y,
+            Pos: {
+                X: x,
+                Y: y,
+            },
+            PrivateState: {},
         });
     }
 }
