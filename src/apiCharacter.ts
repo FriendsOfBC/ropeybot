@@ -18,7 +18,7 @@ import { AppearanceType } from "./appearance.ts";
 import { BC_AppearanceItem } from "./item.ts";
 
 interface PoseObject {
-    Name: string;
+Name: string;
 }
 
 interface SingleScriptPermission {
