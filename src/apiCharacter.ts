@@ -144,14 +144,39 @@ export class API_Character {
     public get WhiteList(): number[] {
         return this.data.WhiteList;
     }
+    protected manageWhitelist(arg: "add" | "remove", ...members: number[]) {
+        const list = this.connection.Player.WhiteList;
+        let update = false;
+        for (const member of members) {
+            const numIdx = list.indexOf(member);
+            if (arg === "add" && numIdx === -1) {
+                // Don't let adding ourselves to the list
+                if (member === this.MemberNumber) continue;
+                list.push(member);
+                update = true;
+            } else if (arg === "remove" && numIdx !== -1) {
+                list.splice(numIdx, 1);
+                update = true;
+            }
+        }
+        if (update) {
+            this.connection.accountUpdate({ WhiteList: list });
+        }
+    }
+    public whitelist(): void {
+        this.manageWhitelist("add", this.MemberNumber);
+    }
+    public unwhitelist(): void {
+        this.manageWhitelist("remove", this.MemberNumber);
+    }
     public get OnlineSharedSettings(): CharacterOnlineSharedSettings {
         return this.data.OnlineSharedSettings;
     }
     public get ItemPermission(): ItemPermissionLevel {
         return this.data.ItemPermission;
     }
-    public get ChatRoomPosition(): number {
-        return 0; /* TODO */
+    public get ChatRoomPosition(): number | undefined {
+        return this.chatRoom?.characters.indexOf(this);
     }
     public get chatRoom(): API_Chatroom | undefined {
         return this.connection._chatRoom;

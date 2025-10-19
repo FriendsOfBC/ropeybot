@@ -63,4 +63,11 @@ export class API_PlayerCharacter extends API_Character {
             });
         }
     }
+
+    public addWhitelist(...members: number[]): void {
+        this.manageWhitelist("add", ...members);
+    }
+    public removeWhitelist(...members: number[]): void {
+        this.manageWhitelist("remove", ...members);
+    }
 }
