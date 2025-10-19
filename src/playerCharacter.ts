@@ -1,5 +1,4 @@
 import { API_Character, API_Character_Data } from "./apiCharacter.ts";
-import { API_Chatroom } from "./apiChatroom.ts";
 import { API_Connector } from "./apiConnector.ts";
 import { BC_AppearanceItem } from "./item.ts";
 
@@ -7,9 +6,8 @@ export class API_PlayerCharacter extends API_Character {
     constructor(
         protected data: API_Character_Data,
         connection: API_Connector,
-        chatRoom?: API_Chatroom,
     ) {
-        super(data, connection, chatRoom);
+        super(data, connection);
     }
 
     public sendItemUpdate(data: BC_AppearanceItem): void {

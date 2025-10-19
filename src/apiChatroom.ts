@@ -178,7 +178,7 @@ export class API_Chatroom extends EventEmitter<ChatRoomEvents> {
     private characterFromCache(data: API_Character_Data) {
         let char = this.characterCache.get(data.MemberNumber);
         if (!char) {
-            char = new API_Character(data, this.conn, this);
+            char = new API_Character(data, this.conn);
             this.characterCache.set(char.MemberNumber, char);
 
             if (this.characterCache.size > 20) this.pruneCharacterCache();

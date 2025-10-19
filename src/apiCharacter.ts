@@ -120,7 +120,6 @@ export class API_Character {
     constructor(
         protected readonly data: API_Character_Data,
         public readonly connection: API_Connector,
-        private _chatRoom?: API_Chatroom,
     ) {
         this._appearance = new AppearanceType(this, data);
     }
@@ -154,14 +153,9 @@ export class API_Character {
     public get ChatRoomPosition(): number {
         return 0; /* TODO */
     }
-
     public get chatRoom(): API_Chatroom | undefined {
-        return this._chatRoom;
+        return this.connection._chatRoom;
     }
-    public set chatRoom(room: API_Chatroom) {
-        this._chatRoom = room;
-    }
-
     public get X(): number {
         return this.data.MapData?.Pos?.X ?? 0;
     }
@@ -329,7 +323,7 @@ export class API_Character {
     }
 
     public MoveToPos(pos: number): void {
-        this._chatRoom?.moveCharacterToPos(this.data.MemberNumber, pos);
+        this.chatRoom?.moveCharacterToPos(this.data.MemberNumber, pos);
     }
 
     public SetExpression(
