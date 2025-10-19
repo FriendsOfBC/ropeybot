@@ -248,7 +248,7 @@ export class API_Character {
         return upperBody?.Name === "Penis" ? "male" : "female";
     }
 
-    public async Kick(): Promise<void> {
+    public Kick(): void {
         this.connection.chatRoomAdmin({
             Action: "Kick",
             MemberNumber: this.MemberNumber,
@@ -256,9 +256,17 @@ export class API_Character {
         });
     }
 
-    public Ban(): void {}
+    public Ban(): void {
+        this.chatRoom?.banCharacter(this);
+    }
 
-    public Demote(): void {}
+    public Promote(): void {
+        this.chatRoom?.promoteAdmin(this);
+    }
+
+    public Demote(): void {
+        this.chatRoom?.demoteAdmin(this);
+    }
 
     public IsBot(): boolean {
         return this.data.MemberNumber === this.connection.Player.MemberNumber;

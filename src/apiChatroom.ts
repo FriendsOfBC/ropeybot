@@ -93,9 +93,41 @@ export class API_Chatroom extends EventEmitter<ChatRoomEvents> {
     }
     public set Admin(value: number[]) {
         this.data.Admin = value;
+        this.saveChanges();
+    }
+    public promoteAdmin(char: API_Character | number) {
+        const member = typeof char === "number" ? char : char.MemberNumber;
+        this.conn.chatRoomAdmin({
+            Action: "Promote",
+            MemberNumber: member,
+            Publish: true,
+        });
+    }
+    public demoteAdmin(char: API_Character | number) {
+        const member = typeof char === "number" ? char : char.MemberNumber;
+        this.conn.chatRoomAdmin({
+            Action: "Demote",
+            MemberNumber: member,
+            Publish: true,
+        });
     }
     public get Ban(): number[] {
         return this.data.Ban;
+    }
+    public banCharacter(char: API_Character | number) {
+        const member = typeof char === "number" ? char : char.MemberNumber;
+        this.conn.chatRoomAdmin({
+            Action: "Ban",
+            MemberNumber: member,
+            Publish: true,
+        });
+    }
+    public unbanCharacter(member: number) {
+        this.conn.chatRoomAdmin({
+            Action: "Unban",
+            MemberNumber: member,
+            Publish: true,
+        });
     }
     public get Private(): boolean {
         return this.data.Private;
