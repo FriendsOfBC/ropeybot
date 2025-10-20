@@ -1,6 +1,7 @@
 import { API_Character, API_Character_Data } from "./apiCharacter.ts";
 import { API_Chatroom } from "./apiChatroom.ts";
 import { API_Connector } from "./apiConnector.ts";
+import { BC_AppearanceItem } from "./item.ts";
 
 export class API_PlayerCharacter extends API_Character {
     constructor(
@@ -9,6 +10,16 @@ export class API_PlayerCharacter extends API_Character {
         chatRoom?: API_Chatroom,
     ) {
         super(data, connection, chatRoom);
+    }
+
+    public sendItemUpdate(data: BC_AppearanceItem): void {
+        super.sendItemUpdate(data);
+        this.connection.accountUpdate({ Appearance: this.data.Appearance });
+    }
+
+    public sendAppearanceUpdate(): void {
+        super.sendAppearanceUpdate();
+        this.connection.accountUpdate({ Appearance: this.data.Appearance });
     }
 
     get friendList(): number[] {

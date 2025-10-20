@@ -854,13 +854,8 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
     }
 
     public accountUpdate(update: Partial<API_Character_Data>): void {
-        const actualUpdate = { ...update };
-        if (actualUpdate.Appearance === undefined) {
-            actualUpdate.Appearance =
-                this.Player.Appearance.getAppearanceData();
-        }
         //console.log("Sending account update", actualUpdate);
-        this.wrappedSock.emit("AccountUpdate", actualUpdate);
+        this.wrappedSock.emit("AccountUpdate", update);
     }
 
     public moveOnMap(x: number, y: number): void {
