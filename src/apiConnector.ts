@@ -778,29 +778,6 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         });
     }
 
-    public setScriptPermissions(hide: boolean, block: boolean): void {
-        this.accountUpdate({
-            OnlineSharedSettings: {
-                GameVersion: GAMEVERSION,
-                ScriptPermissions: {
-                    Hide: {
-                        permission: hide ? 1 : 0,
-                    },
-                    Block: {
-                        permission: block ? 1 : 0,
-                    },
-                },
-                AllowFullWardrobeAccess: false,
-                BlockBodyCosplay: true,
-                AllowPlayerLeashing: false,
-                AllowRename: false,
-                DisablePickingLocksOnSelf: true,
-                ItemsAffectExpressions: false,
-                WheelFortune: "",
-            },
-        });
-    }
-
     public updateCharacterItem(update: ServerCharacterItemUpdate): void {
         /*if (update.Target === this.Player.MemberNumber) {
             const payload = {

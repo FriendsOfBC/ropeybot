@@ -169,9 +169,49 @@ export class API_Character {
     public unwhitelist(): void {
         this.manageWhitelist("remove", this.MemberNumber);
     }
+    // #region Online Shared Settings
+
     public get OnlineSharedSettings(): CharacterOnlineSharedSettings {
         return this.data.OnlineSharedSettings;
     }
+    get allowFullWardrobeAccess(): boolean {
+        return this.data.OnlineSharedSettings.AllowFullWardrobeAccess;
+    }
+    get blockBodyCosplay(): boolean {
+        return this.data.OnlineSharedSettings.BlockBodyCosplay;
+    }
+    get allowPlayerLeashing(): boolean {
+        return this.data.OnlineSharedSettings.AllowPlayerLeashing;
+    }
+    get allowRename(): boolean {
+        return this.data.OnlineSharedSettings.AllowRename;
+    }
+    get disablePickingLocksOnSelf(): boolean {
+        return this.data.OnlineSharedSettings.DisablePickingLocksOnSelf;
+    }
+    get gameVersion(): string {
+        return this.data.OnlineSharedSettings.GameVersion ?? "";
+    }
+    get itemsAffectExpressions(): boolean {
+        return this.data.OnlineSharedSettings.ItemsAffectExpressions;
+    }
+    // get WheelFortune(): string {
+    //     return this.data.OnlineSharedSettings.WheelFortune;
+    // }
+
+    public getScriptPermissions(): { hide: boolean; block: boolean } {
+        const ret = {
+            hide:
+                this.data.OnlineSharedSettings.ScriptPermissions.Hide
+                    .permission !== 0,
+            block:
+                this.data.OnlineSharedSettings.ScriptPermissions.Block
+                    .permission !== 0,
+        };
+        return ret;
+    }
+
+    // #endregion
     public get ItemPermission(): ItemPermissionLevel {
         return this.data.ItemPermission;
     }
