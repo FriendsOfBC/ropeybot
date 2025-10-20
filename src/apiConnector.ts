@@ -327,7 +327,7 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
     };
 
     private onLoginResponse = (resp: ServerLoginResponse) => {
-        console.log("Got login response", resp);
+        // console.log("Got login response", resp);
         if (resp === "InvalidNamePassword") {
             throw new API_Error(
                 "InvalidNamePassword",
@@ -338,6 +338,10 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         this._player = new API_PlayerCharacter(charData, this, undefined);
         this.loggedIn.resolve();
     };
+
+    public async login() {
+        return this.loggedIn.prom;
+    }
 
     private onChatRoomCreateResponse = (resp: string) => {
         console.log("Got chat room create response", resp);
