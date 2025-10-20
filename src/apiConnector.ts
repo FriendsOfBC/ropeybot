@@ -76,6 +76,13 @@ class PromiseResolve<T> {
     }
 }
 
+class API_Error extends Error {
+    constructor(name: string, message: string, options?: ErrorOptions) {
+        super(message, options);
+        this.name = name;
+    }
+}
+
 export interface API_Message {
     sender: API_Character;
     message: BC_Server_ChatRoomMessage;
@@ -321,10 +328,11 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
     private onLoginResponse = (resp: ServerLoginResponse) => {
         console.log("Got login response", resp);
         if (resp === "InvalidNamePassword") {
-            // FIXME: login failed;
-            return;
+            throw new API_Error(
+                "InvalidNamePassword",
+                "Invalid name or password",
+            );
         }
-        // FIXME:
         const charData = resp as unknown as API_Character_Data;
         this._player = new API_PlayerCharacter(charData, this, undefined);
         this.loggedIn.resolve();
@@ -676,19 +684,20 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         this.roomCreatePromise = new PromiseResolve();
 
         const admins = [this._player!.MemberNumber, ...roomDef.Admin];
+        let result;
         try {
             this.wrappedSock.emit("ChatRoomCreate", {
                 ...roomDef,
                 Admin: admins,
             });
 
-            const createResult = await this.roomCreatePromise.prom;
-            if (createResult !== "ChatRoomCreated") {
-                console.log("Failed to create room", createResult);
-                return false;
-            }
+            result = await this.roomCreatePromise.prom;
         } finally {
             this.roomCreatePromise = undefined;
+        }
+
+        if (result !== "ChatRoomCreated") {
+            throw new API_Error(result, "Failed to create room");
         }
 
         console.log("Room created");
