@@ -95,6 +95,7 @@ interface ConnectorEvents {
     RoomJoin: [];
     RoomCreate: [];
     CharacterEntered: [character: API_Character];
+    CharacterSync: [character: API_Character];
     CharacterLeft: [
         sourceMemberNumber: number,
         character: API_Character,

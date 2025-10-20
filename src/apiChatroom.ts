@@ -271,6 +271,7 @@ export class API_Chatroom extends EventEmitter<ChatRoomEvents> {
                 });
             }
         }
+        this.conn.emit("CharacterSync", char);
     }
 
     public characterItemUpdate(itemUpdate: ServerCharacterItemUpdate) {
