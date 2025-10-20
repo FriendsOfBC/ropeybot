@@ -18,7 +18,7 @@ import {
     API_Character_Data,
     transformToCharacterData,
 } from "./apiCharacter.ts";
-import { API_Connector } from "./apiConnector.ts";
+import { API_Connector, API_Error } from "./apiConnector.ts";
 import { API_Map } from "./apiMap.ts";
 import { API_AppearanceItem } from "./item.ts";
 import { API_PlayerCharacter } from "./playerCharacter.ts";
@@ -410,7 +410,13 @@ export class API_Chatroom extends EventEmitter<ChatRoomEvents> {
         return this.characterFromCache(char);
     }
 
-    public moveCharacterToPos(memberNo: number, pos: number): Promise<void> {
+    public async moveCharacterToPos(
+        memberNo: number,
+        pos: number,
+    ): Promise<void> {
+        if (!this.conn.Player.IsRoomAdmin()) {
+            throw new API_Error("NotAdmin", "You are not an admin of the room");
+        }
         const prom = new Promise<void>((resolve) => {
             this.reorderWatcher.once("reorder", resolve);
             setTimeout(resolve, 1000);

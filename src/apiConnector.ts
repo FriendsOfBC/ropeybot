@@ -76,7 +76,7 @@ class PromiseResolve<T> {
     }
 }
 
-class API_Error extends Error {
+export class API_Error extends Error {
     constructor(name: string, message: string, options?: ErrorOptions) {
         super(message, options);
         this.name = name;
