@@ -1,14 +1,72 @@
 import { API_Character, API_Character_Data } from "./apiCharacter.ts";
-import { API_Chatroom } from "./apiChatroom.ts";
 import { API_Connector } from "./apiConnector.ts";
+import { BC_AppearanceItem } from "./item.ts";
 
 export class API_PlayerCharacter extends API_Character {
     constructor(
         protected data: API_Character_Data,
         connection: API_Connector,
-        chatRoom?: API_Chatroom,
     ) {
-        super(data, connection, chatRoom);
+        super(data, connection);
+    }
+
+    // #region Online Shared Settings
+
+    private updateOnlineSharedSettings(): void {
+        this.connection.accountUpdate({
+            OnlineSharedSettings: this.data.OnlineSharedSettings,
+        });
+    }
+
+    set allowFullWardrobeAccess(value: boolean) {
+        this.data.OnlineSharedSettings.AllowFullWardrobeAccess = value;
+        this.updateOnlineSharedSettings();
+    }
+
+    set blockBodyCosplay(value: boolean) {
+        this.data.OnlineSharedSettings.BlockBodyCosplay = value;
+        this.updateOnlineSharedSettings();
+    }
+
+    set allowPlayerLeashing(value: boolean) {
+        this.data.OnlineSharedSettings.AllowPlayerLeashing = value;
+        this.updateOnlineSharedSettings();
+    }
+
+    set allowRename(value: boolean) {
+        this.data.OnlineSharedSettings.AllowRename = value;
+        this.updateOnlineSharedSettings();
+    }
+
+    set disablePickingLocksOnSelf(value: boolean) {
+        this.data.OnlineSharedSettings.DisablePickingLocksOnSelf = value;
+        this.updateOnlineSharedSettings();
+    }
+
+    set itemsAffectExpressions(value: boolean) {
+        this.data.OnlineSharedSettings.ItemsAffectExpressions = value;
+        this.updateOnlineSharedSettings();
+    }
+
+    public setScriptPermissions(hide: boolean, block: boolean): void {
+        this.data.OnlineSharedSettings.ScriptPermissions.Hide.permission = hide
+            ? 1
+            : 0;
+        this.data.OnlineSharedSettings.ScriptPermissions.Block.permission =
+            block ? 1 : 0;
+        this.updateOnlineSharedSettings();
+    }
+
+    // #endregion
+
+    public sendItemUpdate(data: BC_AppearanceItem): void {
+        super.sendItemUpdate(data);
+        this.connection.accountUpdate({ Appearance: this.data.Appearance });
+    }
+
+    public sendAppearanceUpdate(): void {
+        super.sendAppearanceUpdate();
+        this.connection.accountUpdate({ Appearance: this.data.Appearance });
     }
 
     get friendList(): number[] {
@@ -53,5 +111,12 @@ export class API_PlayerCharacter extends API_Character {
                 FriendList: list,
             });
         }
+    }
+
+    public addWhitelist(...members: number[]): void {
+        this.manageWhitelist("add", ...members);
+    }
+    public removeWhitelist(...members: number[]): void {
+        this.manageWhitelist("remove", ...members);
     }
 }

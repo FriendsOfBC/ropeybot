@@ -18,7 +18,7 @@ import {
     API_Character_Data,
     transformToCharacterData,
 } from "./apiCharacter.ts";
-import { API_Connector } from "./apiConnector.ts";
+import { API_Connector, API_Error } from "./apiConnector.ts";
 import { API_Map } from "./apiMap.ts";
 import { API_AppearanceItem } from "./item.ts";
 import { API_PlayerCharacter } from "./playerCharacter.ts";
@@ -93,9 +93,41 @@ export class API_Chatroom extends EventEmitter<ChatRoomEvents> {
     }
     public set Admin(value: number[]) {
         this.data.Admin = value;
+        this.saveChanges();
+    }
+    public promoteAdmin(char: API_Character | number) {
+        const member = typeof char === "number" ? char : char.MemberNumber;
+        this.conn.chatRoomAdmin({
+            Action: "Promote",
+            MemberNumber: member,
+            Publish: true,
+        });
+    }
+    public demoteAdmin(char: API_Character | number) {
+        const member = typeof char === "number" ? char : char.MemberNumber;
+        this.conn.chatRoomAdmin({
+            Action: "Demote",
+            MemberNumber: member,
+            Publish: true,
+        });
     }
     public get Ban(): number[] {
         return this.data.Ban;
+    }
+    public banCharacter(char: API_Character | number) {
+        const member = typeof char === "number" ? char : char.MemberNumber;
+        this.conn.chatRoomAdmin({
+            Action: "Ban",
+            MemberNumber: member,
+            Publish: true,
+        });
+    }
+    public unbanCharacter(member: number) {
+        this.conn.chatRoomAdmin({
+            Action: "Unban",
+            MemberNumber: member,
+            Publish: true,
+        });
     }
     public get Private(): boolean {
         return this.data.Private;
@@ -178,7 +210,7 @@ export class API_Chatroom extends EventEmitter<ChatRoomEvents> {
     private characterFromCache(data: API_Character_Data) {
         let char = this.characterCache.get(data.MemberNumber);
         if (!char) {
-            char = new API_Character(data, this.conn, this);
+            char = new API_Character(data, this.conn);
             this.characterCache.set(char.MemberNumber, char);
 
             if (this.characterCache.size > 20) this.pruneCharacterCache();
@@ -271,6 +303,7 @@ export class API_Chatroom extends EventEmitter<ChatRoomEvents> {
                 });
             }
         }
+        this.conn.emit("CharacterSync", char);
     }
 
     public characterItemUpdate(itemUpdate: ServerCharacterItemUpdate) {
@@ -377,7 +410,13 @@ export class API_Chatroom extends EventEmitter<ChatRoomEvents> {
         return this.characterFromCache(char);
     }
 
-    public moveCharacterToPos(memberNo: number, pos: number): Promise<void> {
+    public async moveCharacterToPos(
+        memberNo: number,
+        pos: number,
+    ): Promise<void> {
+        if (!this.conn.Player.IsRoomAdmin()) {
+            throw new API_Error("NotAdmin", "You are not an admin of the room");
+        }
         const prom = new Promise<void>((resolve) => {
             this.reorderWatcher.once("reorder", resolve);
             setTimeout(resolve, 1000);

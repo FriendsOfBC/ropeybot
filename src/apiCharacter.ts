@@ -120,7 +120,6 @@ export class API_Character {
     constructor(
         protected readonly data: API_Character_Data,
         public readonly connection: API_Connector,
-        private _chatRoom?: API_Chatroom,
     ) {
         this._appearance = new AppearanceType(this, data);
     }
@@ -145,23 +144,83 @@ export class API_Character {
     public get WhiteList(): number[] {
         return this.data.WhiteList;
     }
+    protected manageWhitelist(arg: "add" | "remove", ...members: number[]) {
+        const list = this.connection.Player.WhiteList;
+        let update = false;
+        for (const member of members) {
+            const numIdx = list.indexOf(member);
+            if (arg === "add" && numIdx === -1) {
+                // Don't let adding ourselves to the list
+                if (member === this.MemberNumber) continue;
+                list.push(member);
+                update = true;
+            } else if (arg === "remove" && numIdx !== -1) {
+                list.splice(numIdx, 1);
+                update = true;
+            }
+        }
+        if (update) {
+            this.connection.accountUpdate({ WhiteList: list });
+        }
+    }
+    public whitelist(): void {
+        this.manageWhitelist("add", this.MemberNumber);
+    }
+    public unwhitelist(): void {
+        this.manageWhitelist("remove", this.MemberNumber);
+    }
+    // #region Online Shared Settings
+
     public get OnlineSharedSettings(): CharacterOnlineSharedSettings {
         return this.data.OnlineSharedSettings;
     }
+    get allowFullWardrobeAccess(): boolean {
+        return this.data.OnlineSharedSettings.AllowFullWardrobeAccess;
+    }
+    get blockBodyCosplay(): boolean {
+        return this.data.OnlineSharedSettings.BlockBodyCosplay;
+    }
+    get allowPlayerLeashing(): boolean {
+        return this.data.OnlineSharedSettings.AllowPlayerLeashing;
+    }
+    get allowRename(): boolean {
+        return this.data.OnlineSharedSettings.AllowRename;
+    }
+    get disablePickingLocksOnSelf(): boolean {
+        return this.data.OnlineSharedSettings.DisablePickingLocksOnSelf;
+    }
+    get gameVersion(): string {
+        return this.data.OnlineSharedSettings.GameVersion ?? "";
+    }
+    get itemsAffectExpressions(): boolean {
+        return this.data.OnlineSharedSettings.ItemsAffectExpressions;
+    }
+    // get WheelFortune(): string {
+    //     return this.data.OnlineSharedSettings.WheelFortune;
+    // }
+
+    public getScriptPermissions(): { hide: boolean; block: boolean } {
+        const ret = {
+            hide:
+                this.data.OnlineSharedSettings.ScriptPermissions.Hide
+                    .permission !== 0,
+            block:
+                this.data.OnlineSharedSettings.ScriptPermissions.Block
+                    .permission !== 0,
+        };
+        return ret;
+    }
+
+    // #endregion
     public get ItemPermission(): ItemPermissionLevel {
         return this.data.ItemPermission;
     }
-    public get ChatRoomPosition(): number {
-        return 0; /* TODO */
+    public get ChatRoomPosition(): number | undefined {
+        return this.chatRoom?.characters.indexOf(this);
     }
-
     public get chatRoom(): API_Chatroom | undefined {
-        return this._chatRoom;
+        return this.connection._chatRoom;
     }
-    public set chatRoom(room: API_Chatroom) {
-        this._chatRoom = room;
-    }
-
     public get X(): number {
         return this.data.MapData?.Pos?.X ?? 0;
     }
@@ -229,7 +288,7 @@ export class API_Character {
         return upperBody?.Name === "Penis" ? "male" : "female";
     }
 
-    public async Kick(): Promise<void> {
+    public Kick(): void {
         this.connection.chatRoomAdmin({
             Action: "Kick",
             MemberNumber: this.MemberNumber,
@@ -237,9 +296,17 @@ export class API_Character {
         });
     }
 
-    public Ban(): void {}
+    public Ban(): void {
+        this.chatRoom?.banCharacter(this);
+    }
 
-    public Demote(): void {}
+    public Promote(): void {
+        this.chatRoom?.promoteAdmin(this);
+    }
+
+    public Demote(): void {
+        this.chatRoom?.demoteAdmin(this);
+    }
 
     public IsBot(): boolean {
         return this.data.MemberNumber === this.connection.Player.MemberNumber;
@@ -329,7 +396,7 @@ export class API_Character {
     }
 
     public MoveToPos(pos: number): void {
-        this._chatRoom?.moveCharacterToPos(this.data.MemberNumber, pos);
+        this.chatRoom?.moveCharacterToPos(this.data.MemberNumber, pos);
     }
 
     public SetExpression(

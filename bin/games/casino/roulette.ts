@@ -184,7 +184,7 @@ export class RouletteGame implements Game {
                 console.error("Failed to set bio.", e);
             });
 
-            this.conn.setScriptPermissions(true, false);
+            this.conn.Player.setScriptPermissions(true, false);
 
             const scriptItem = this.conn.Player.Appearance.AddItem(
                 AssetGet("ItemScript", "Script"),

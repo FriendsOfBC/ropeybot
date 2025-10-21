@@ -25,7 +25,7 @@ const BLACKJACKCOMMANDS = `Blackjack commands:
 /bot hit - Take another card from the deck.
 /bot stand - Keep your current hand
 /bot double - Double your bet and take one more card. Only available on your first two cards.
-/bot split - Split your hand into two hands if you have two cards of the same value. 
+/bot split - Split your hand into two hands if you have two cards of the same value.
 /bot cancel - Cancel your bet. Only available before any cards are dealt.
 /bot chips - Show your current chip balance.
 /bot give <name or member number> <amount> - Give chips to another player.
@@ -137,7 +137,7 @@ export class BlackjackGame implements Game {
                 console.error("Failed to set bio.", e);
             });
 
-            this.conn.setScriptPermissions(true, false);
+            this.conn.Player.setScriptPermissions(true, false);
 
             const scriptItem = this.conn.Player.Appearance.AddItem(
                 AssetGet("ItemScript", "Script"),
@@ -190,7 +190,7 @@ export class BlackjackGame implements Game {
         pole = this.conn.Player.Appearance.AddItem(
             AssetGet("ItemDevices", "Pole"),
         );
-        console.log("Adding pole to appearance"); 
+        console.log("Adding pole to appearance");
         pole.SetColor(["#AC9A85"]);
 /**/
         console.log("Adding pole to inventory");
