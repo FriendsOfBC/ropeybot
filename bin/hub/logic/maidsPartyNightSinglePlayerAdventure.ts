@@ -331,7 +331,7 @@ export class MaidsPartyNightSinglePlayerAdventure extends LoggingLogic {
 		if (this.player === null && !connection.chatRoom.Admin.includes(character.MemberNumber)) {
 			await this.conn.ChatRoomUpdate({
 				Limit: 10,
-				Locked: true
+				Access: ["Admin", "Whitelist"]
 			});
 			await this.resetRoom(character);
 			this.playerAppearanceStorage = character.Appearance.MakeAppearanceBundle();
@@ -1221,7 +1221,7 @@ export class MaidsPartyNightSinglePlayerAdventure extends LoggingLogic {
 		await this.conn.ChatRoomUpdate({
 			Admin: [this.conn.Player.MemberNumber, this.conn2.Player.MemberNumber, ...SUPERUSERS],
 			Limit: _.clamp(this.conn.chatRoom.characters.filter(c => c.IsRoomAdmin()).length + 1, 2, 10),
-			Locked: false
+			Access: ["All"],
 		});
 	}
 

@@ -19,16 +19,16 @@
     },
     "dependencies": {
         "@socket.io/component-emitter": "^3.1.2",
-        "bc-stubs": "^118.0.0",
+        "bc-stubs": "123.0.0-Beta.3",
         "lz-string": "^1.5.0",
-        "prettier": "^3.6.2",
-        "socket.io-client": "^4.8.1"
+        "prettier": "^3.7.4",
+        "socket.io-client": "^4.8.3"
     },
     "devDependencies": {
-        "@tsconfig/node18": "^18.2.4",
-        "@types/node": "^20.19.9",
-        "esbuild": "^0.19.12",
-        "tsx": "^4.20.3",
-        "typescript": "^5.8.3"
+        "@tsconfig/node18": "^18.2.6",
+        "@types/node": "^20.19.27",
+        "esbuild": "^0.27.2",
+        "tsx": "^4.21.0",
+        "typescript": "^5.9.3"
     }
 }

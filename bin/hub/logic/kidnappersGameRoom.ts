@@ -743,7 +743,7 @@ https://github.com/FriendsOfBC/ropeybot
 			}
 			void this.conn.ChatRoomUpdate({
 				Description: `[BOT] scripted multiplayer gameroom | manual in bot profile | PLAYING`,
-				Private: true,
+				Visibility: ["Admin", "Whitelist"],
 			});
 			this.setActiveConfigFromTemplate(config);
 			this.players.map(P => this.freePlayerInItemSlots(P, listOfUsedItemGroups));
@@ -1388,7 +1388,7 @@ https://github.com/FriendsOfBC/ropeybot
 				void this.conn.ChatRoomUpdate({
 					Description: `[BOT] scripted multiplayer gameroom | manual in bot profile | READY`,
 					Background: "MainHall",
-					Private: true,
+					Visibility: ["Admin", "Whitelist"]
 				});
 			}
 			this.kidnappers.clear();
@@ -1467,7 +1467,7 @@ https://github.com/FriendsOfBC/ropeybot
 			if (updateRoom) {
 				void this.conn.ChatRoomUpdate({
 					Description: `[BOT] scripted multiplayer gameroom | manual in bot profile | READY`,
-					Private: true,
+					Visibility: ["Admin", "Whitelist"]
 				});
 			}
 			this.turnTimer = Date.now() + this.active_config.victoryDuration;

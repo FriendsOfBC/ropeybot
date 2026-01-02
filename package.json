@@ -12,19 +12,19 @@
     },
     "dependencies": {
         "bc-bot": "link:src",
-        "bc-stubs": "121.0.0",
+        "bc-stubs": "123.0.0-Beta.3",
         "lodash": "^4.17.21",
         "lz-string": "^1.5.0",
-        "mongodb": "^6.16.0",
-        "prettier": "^3.5.3",
+        "mongodb": "^6.21.0",
+        "prettier": "^3.7.4",
         "prom-client": "^14.2.0"
     },
     "devDependencies": {
-        "@tsconfig/node18": "^18.2.4",
-        "@types/lodash": "^4.17.17",
-        "@types/node": "^20.17.50",
-        "esbuild": "^0.19.12",
-        "tsx": "^4.19.4",
-        "typescript": "^5.8.3"
+        "@tsconfig/node18": "^18.2.6",
+        "@types/lodash": "^4.17.21",
+        "@types/node": "^20.19.27",
+        "esbuild": "^0.27.2",
+        "tsx": "^4.21.0",
+        "typescript": "^5.9.3"
     }
 }

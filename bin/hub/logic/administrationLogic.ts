@@ -257,7 +257,7 @@ export class AdministrationLogic extends LogicBase {
 			}
 			respond("Ok");
 			return connection.ChatRoomUpdate({
-				Private: argv[0] === "true"
+				Visibility: argv[0] === "true" ? ["Admin", "Whitelist"] : ["All"],
 			});
 		});
 
