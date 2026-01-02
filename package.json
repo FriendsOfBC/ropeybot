@@ -3,6 +3,7 @@
     "license": "Apache-2.0",
     "private": "true",
     "scripts": {
+        "preinstall": "cd src && pnpm install",
         "types": "tsc",
         "prettier": "prettier -c .",
         "compile:bc-bot": "cd src && npm run compile",
