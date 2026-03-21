@@ -397,10 +397,10 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
             `chat room member left with reason ${this.leaveReasons.get(resp.SourceMemberNumber)}`,
             resp,
         );
-        this._chatRoom!.memberLeft(resp.SourceMemberNumber);
         const leftMember = this._chatRoom!.getCharacter(
             resp.SourceMemberNumber,
         );
+        this._chatRoom!.memberLeft(resp.SourceMemberNumber);
         if (!leftMember) return;
 
         const isIntentional =
