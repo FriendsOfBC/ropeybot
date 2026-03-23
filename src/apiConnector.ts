@@ -367,6 +367,14 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         delete roomData.Character;
         // @ts-expect-error not part of RoomDefinition
         delete roomData.SourceMemberNumber;
+        /** fixes invalid room data on reconnection @see {@link API_Connector.onChatRoomSyncRoomProperties} */
+        // remove these if they're there. The server will have converted to new
+        // Access / Visibility fields and won't accept a ChatRoomCreate with both
+        // Private/Locked and Access/Visibility
+        // @ts-expect-error not part of RoomDefinition
+        delete roomData.Private;
+        // @ts-expect-error not part of RoomDefinition
+        delete roomData.Locked;
         this.roomJoined = roomData;
         this.roomSynced.resolve();
     };
@@ -434,14 +442,14 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         // a void, we recreate the room with the same settings
         const roomData = structuredClone(resp);
         // @ts-expect-error not part of RoomDefinition
-        delete resp.SourceMemberNumber;
+        delete roomData.SourceMemberNumber;
         // remove these if they're there. The server will have converted to new
         // Access / Visibility fields and won't accept a ChatRoomCreate with both
         // Private/Locked and Access/Visibility
         // @ts-expect-error not part of RoomDefinition
-        delete resp.Private;
+        delete roomData.Private;
         // @ts-expect-error not part of RoomDefinition
-        delete resp.Locked;
+        delete roomData.Locked;
 
         this.roomJoined = roomData;
     };
