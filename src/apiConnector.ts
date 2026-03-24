@@ -669,7 +669,7 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         } finally {
             this.roomJoinPromise = undefined;
         }
-        
+
         if (result !== "JoinedRoom") {
             console.error("Failed to join room", result);
             return false;
