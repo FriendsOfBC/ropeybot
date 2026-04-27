@@ -703,7 +703,9 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         console.log("creating room");
         this.roomCreatePromise = new PromiseResolve();
 
-        const admins = [this._player!.MemberNumber, ...roomDef.Admin];
+        const admins = [...roomDef.Admin];
+        if (!(admins.includes(this._player!.MemberNumber)))
+            admins.unshift(this._player!.MemberNumber);
         let result;
         try {
             this.wrappedSock.emit("ChatRoomCreate", {
