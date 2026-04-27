@@ -175,6 +175,14 @@ export class API_Character {
     public unwhitelist(): void {
         this.manageWhitelist("remove", this.MemberNumber);
     }
+
+    // #region Other Misc Character Info
+    public get Dominance() {
+        if (!this.data.Reputation.length) return 0;
+        return this.data.Reputation.find(r => r.Type === "Dominant")?.Value ?? 0;
+    }
+    // #endregion
+
     // #region Online Shared Settings
 
     public get OnlineSharedSettings(): CharacterOnlineSharedSettings {
