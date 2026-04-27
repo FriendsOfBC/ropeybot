@@ -40,6 +40,7 @@ export interface API_Character_Data {
     ActivePose: readonly AssetPoseName[];
     WhiteList: number[];
     BlackList: ServerAccountDataSynced["BlackList"],
+    Reputation: NonNullable<ServerAccountDataSynced["Reputation"]>,
     OnlineSharedSettings: CharacterOnlineSharedSettings;
     ItemPermission: ItemPermissionLevel;
     FriendList: number[];
@@ -83,6 +84,7 @@ export function transformToCharacterData(
     }
     return {
         ...character,
+        Reputation: character.Reputation ?? [],
         Nickname: character.Nickname ?? "",
         Description: character.Description ?? "",
         Appearance: character.Appearance ?? [],
