@@ -5,6 +5,8 @@ interface Fetish {
 	GetFactor(C: Character): number;
 }
 
+type BodyStyle = "EchoV1" | "EchoV2" | AssetGroupName;
+
 /** Types for representing the left/top coordinate of a target draw rect. */
 declare namespace TopLeft {
 	/**
@@ -14,11 +16,20 @@ declare namespace TopLeft {
 	 */
 	type Data = Readonly<Partial<Record<AssetPoseName, number>> & Record<PoseTypeDefault, number>>;
 	/**
+	 * Mutable datastructure variant as to be used at the {@link ItemProperties} level.
+	 * See {@link TopLeft.Data}
+	 */
+	type DataMutable = Partial<Record<AssetPoseName | PoseTypeDefault, number>>;
+	/**
 	 * The unparsed top/left coordinate translation.
 	 * Can be either a number or, if one wants to specify pose-specific translations, a record mapping pose names to numbers.
 	 * The {@link PoseType.DEFAULT} key can be specified in the record-notation as a default pose-agnostic value.
 	 */
 	type Definition = number | Partial<Record<AssetPoseName | PoseTypeDefault, number>>;
+	/** See {@link ItemProperties["DrawingTop"]} */
+	type ItemData = Partial<Record<AssetOverride | LayerName, TopLeft.DataMutable>>;
+	/** See {@link ItemPropertiesConfig["DrawingTop"]} */
+	type ItemDefinition = Partial<Record<AssetOverride | LayerName, TopLeft.Definition>>;
 }
 
 /** Types for objects defining a group of alpha masks to be applied when drawing an asset layer. */
@@ -145,8 +156,11 @@ interface AssetCommonPropertiesGroupAssetLayer {
 
 	/**
 	 * A group identifier that will be used to inherit the body size.
+	 *
 	 * Body sizes can be either be used for all poses (by passing a singular group) or on a pose-by-pose basis (via passing an object).
 	 * In the latter case {@link PoseType.DEFAULT} can be used to override the default for _all_ groups when used as key, or to disable inheritance when used as value.
+	 *
+	 * A value of `undefined` means the parent group will be inherited. A value of `""` will make it size-independent.
 	 *
 	 * @example
 	 * // Inherit from the body sizes `BodyLower` by default, but do not inherit for the `AllFours` pose
@@ -155,19 +169,7 @@ interface AssetCommonPropertiesGroupAssetLayer {
 	 *     AllFours: PoseType.DEFAULT,
 	 * },
 	 */
-	ParentGroup?: ParentGroup.Definition | null;
-
-	/**
-	 * The poses that have pose-specific assets.
-	 *
-	 * Used when building the file paths for the asset's layers.
-	 *
-	 * If a pose is absent then the asset corresponding to the default pose will be used in its place.
-	 * Note that a pose's absence from this list does *not* prevent its usage.
-	 *
-	 * @deprecated - Superceded by {@link PoseMapping}
-	 */
-	AllowPose?: never;
+	ParentGroup?: ParentGroup.Definition | "";
 
 	/**
      * A record mapping pose names to the actually to-be drawn poses.
@@ -216,12 +218,6 @@ interface AssetCommonPropertiesGroupAsset {
 
 	/** A pose that the character will change to when wearing the asset */
 	SetPose?: AssetPoseName[];
-
-	/**
-	 * A list of pose categories that the character will be prevented to change
-	 * @deprecated Use {@link AssetDefinition.AllowActivePose} instead
-	 */
-	FreezeActivePose?: never;
 
 	/** Which expression the group allows to be set on it */
 	AllowExpression?: ExpressionName[];
@@ -346,7 +342,7 @@ interface AssetGroupDefinitionBase extends AssetCommonPropertiesGroupAsset, Asse
 	 *
 	 * Those are used when generating random appearances or cycling colors in the wardrobe
 	 */
-	Color?: HexColor[];
+	Color?: BCColor[];
 
 	/**
 	 * A group that will be used to copy the size info from
@@ -405,14 +401,14 @@ interface AssetGroupDefinitionBase extends AssetCommonPropertiesGroupAsset, Asse
 	MirrorActivitiesFrom?: AssetGroupItemName;
 
 	/**
-	 * The group actually recieving arousal events
+	 * The group actually receiving arousal events
 	 *
 	 * Used to proxy around a group that does not have activities
 	 * enabled (and thus arousal settings.
 	 */
 	ArousalZone?: AssetGroupItemName;
 
-	ColorSuffix?: Record<string, string>;
+	ColorSuffix?: Partial<Record<"HEX_COLOR" | BCColor, BCColor>>;
 	ExpressionPrerequisite?: AssetPrerequisite[];
 	HasPreviewImages?: boolean;
 }
@@ -461,20 +457,10 @@ type AssetBonusName = "KidnapDomination" | "KidnapSneakiness" | "KidnapBruteForc
 type AssetGender = 'F' | 'M';
 
 interface AssetCommonPropertiesAssetLayer {
-	/**
-	 * A list of poses that hide the asset when they get set.
-	 *
-	 * Note that this does not prevent usage of the pose (see {@link AssetDefinition.AllowActivePose}).
-	 * Values are automatically added to {@link Asset.AllowPose}.
-	 *
-	 * @deprecated - Superceded by {@link AssetCommonPropertiesGroupAssetLayer.PoseMapping}
-	 */
-	HideForPose?: never;
-
 	/** A list of alpha mask definitions. */
 	Alpha?: Alpha.Definition[];
 
-	ColorSuffix?: Record<string, string>;
+	ColorSuffix?: Partial<Record<"HEX_COLOR" | BCColor, BCColor>>;
 
 	/** Whether the asset is drawn at an absolute position. */
 	FixedPosition?: boolean;
@@ -532,7 +518,7 @@ interface AssetDefinitionBase extends AssetCommonPropertiesGroupAsset, AssetComm
 	NotVisibleOnScreen?: string[];
 
 	/** Specify body type overrides that live in the asset override folder */
-	StyleOverride?: string[];
+	StyleOverride?: BodyStyle[];
 	CreateLayerTypesOverride?: number[];
 
 	DrawOffset?: {
@@ -602,9 +588,6 @@ interface AssetDefinitionBase extends AssetCommonPropertiesGroupAsset, AssetComm
 	 */
 	AllowActivePose?: AssetPoseName[];
 
-	/** @deprecated - Use {@link AssetDefinition.AllowActivePose} instead */
-	WhitelistActivePose?: never;
-
 	/**
 	 * The cost of the asset in the shop. Defaults to 0.
 	 *
@@ -644,6 +627,12 @@ interface AssetDefinitionBase extends AssetCommonPropertiesGroupAsset, AssetComm
 	MaxTimer?: number;
 
 	Height?: number;
+	/**
+	 * The height of the character as set in the special `Height` appearance group.
+	 *
+	 * Is represented by a number in the `[0.9, 1.0]` interval.
+	 * @default 1.0
+	 */
 	Zoom?: number;
 	Prerequisite?: AssetPrerequisite | AssetPrerequisite[];
 	Extended?: boolean;
@@ -677,8 +666,6 @@ interface AssetDefinitionBase extends AssetCommonPropertiesGroupAsset, AssetComm
 	AllowBlock?: AssetGroupItemName[];
 	AllowHide?: AssetGroupItemName[];
 	AllowHideItem?: string[];
-	/** @deprecated */
-	AllowTypes?: never;
 	/** A list of {@link TypeRecord} keys for which a single layer expects multiple type-specific .png files. */
 	CreateLayerTypes?: string[];
 	/**
@@ -711,16 +698,6 @@ interface AssetDefinitionBase extends AssetCommonPropertiesGroupAsset, AssetComm
 	DynamicActivity?: (C: Character) => ActivityName | null | undefined;
 	DynamicAudio?: (C: Character) => string;
 
-	/**
-	 * Whether the asset is restricted to a given character.
-	 *
-	 * When the asset is added to a character, the member number of the character using the
-	 * asset will be stored along in its properties, and all subsequent modifications will
-	 * only be possible for that character.
-	 *
-	 * @deprecated Discontinued in favor of the {@link FamilyOnly}/{@link LoverOnly}/{@link OwnerOnly} trio
-	 */
-	CharacterRestricted?: never;
 	AllowRemoveExclusive?: boolean;
 
 	DynamicBeforeDraw?: boolean;
@@ -728,8 +705,8 @@ interface AssetDefinitionBase extends AssetCommonPropertiesGroupAsset, AssetComm
 	DynamicScriptDraw?: boolean;
 	AllowLockType?: AssetLockType[];
 
-	/** Whether the color picker shows a "Whole Item" layer. Defaults to true. */
-	AllowColorizeAll?: boolean;
+	/** @deprecated Removed without replacement: items _must_ support a "color all layers" button (to the extent that the item is colorable in the first place) */
+	AllowColorizeAll?: never;
 
 	/** A list of online spaces (eg. Asylum) where the asset is automatically available */
 	AvailableLocations?: string[];
@@ -772,7 +749,7 @@ interface AssetDefinitionBase extends AssetCommonPropertiesGroupAsset, AssetComm
 	/** Applies screen tints when the asset is worn */
 	Tint?: TintDefinition[];
 	/** The default tint color (unless overriden by {@link TintDefinition.DefaultColor} */
-	DefaultTint?: string;
+	DefaultTint?: BCColor;
 	Gender?: AssetGender;
 
 	/**
@@ -791,6 +768,7 @@ declare namespace AssetDefinition {
 	/** An {@link AssetDefinition} subtype for assets whose group is of the `Item` category. */
 	interface Item extends AssetDefinitionBase {
 		BodyCosplay?: false;
+		Zoom?: never;
 	}
 	/** An {@link AssetDefinition} subtype for assets whose group is of the `Appearance` category. */
 	interface Appearance extends AssetDefinitionBase {
@@ -841,14 +819,15 @@ interface AttributionDefinition {
 	Author?: string;
 	Email?: string;
 	License?: string;
+	OriginalName?: string;
 }
 
 interface AssetLayerDefinition extends AssetCommonPropertiesGroupAssetLayer, AssetCommonPropertiesAssetLayer {
 	/** The layer's name */
-	Name?: string;
+	Name?: LayerName;
 
 	/** Uses the color of the named layer. */
-	CopyLayerColor?: string;
+	CopyLayerColor?: LayerName;
 
 	/** The color group that layer is part of. Layers part of the same color group get a selector in the Color Picker UI */
 	ColorGroup?: string;
@@ -904,7 +883,7 @@ interface AssetLayerDefinition extends AssetCommonPropertiesGroupAssetLayer, Ass
 	/**
 	 * Specify body type overrides that live in the asset override folder
 	 */
-	StyleOverride?: string[];
+	StyleOverride?: BodyStyle[];
 	CreateLayerTypesOverride?: number[];
 
 	MirrorExpression?: AssetGroupName;
@@ -961,7 +940,7 @@ interface ExtendedItemConfig<OptionType extends ExtendedItemOption> {
 	/** A record containing various dialog keys used by the extended item screen */
 	DialogPrefix?: ExtendedItemCapsDialog<any, OptionType>;
 	/**
-	 * A recond containing functions that are run on load, click, draw, exit, and validate, with the original archetype function
+	 * A record containing functions that are run on load, click, draw, exit, and validate, with the original archetype function
 	 * and parameters passed on to them. If undefined, these are ignored.
 	 * Note that scripthook functions must be loaded before `Female3DCGExtended.js` in `index.html`.
 	 */
@@ -1017,7 +996,7 @@ interface ExtendedItemOptionConfig {
 	 */
 	ChangeWhenLocked?: boolean;
 	/** The Property object to be applied when this option is used */
-	Property?: ItemProperties;
+	Property?: ItemPropertiesConfig;
 	/**
 	 * Trigger this expression when changing to this option
 	 *
@@ -1032,6 +1011,10 @@ interface ExtendedItemOptionConfig {
 	PrerequisiteBuyGroup?: string;
 	/** If the option has an archetype, sets the config to use */
 	ArchetypeConfig?: null | AssetArchetypeConfig;
+	DrawOptions?: {
+		Mirror?: boolean;
+		Invert?: boolean;
+	}
 }
 
 /** Defines a single (fully parsed) extended item option */
@@ -1055,6 +1038,7 @@ interface ExtendedItemOption extends Omit<ExtendedItemOptionConfig, "ArchetypeCo
 	ParentData: ExtendedItemData<any>;
 	/** The extended item data of the subscreen associated with this option (if any) */
 	ArchetypeData?: null | AssetArchetypeData;
+	Property?: ItemProperties;
 }
 
 type ExtendedItemOptionUnion = (
@@ -1114,7 +1098,7 @@ type ExtendedItemNPCCallback<OptionType extends ExtendedItemOption> = (
 
 /** Partially parsed extended item option subtype for typed items */
 interface TypedItemOptionConfig extends ExtendedItemOptionConfig {
-	Property?: Omit<ItemProperties, "TypeRecord">;
+	Property?: Omit<ItemPropertiesConfig, "TypeRecord">;
 	/** Whether or not this option can be selected randomly */
 	Random?: boolean;
 	/** Whether this option should be picked as default for NPC's (rather than just going for the first option) */
@@ -1157,7 +1141,7 @@ interface TypedItemConfig extends ExtendedItemConfig<TypedItemOption> {
 	 */
 	ChangeWhenLocked?: boolean;
 	/**
-	 * A recond containing functions that are run on load, click, draw, exit, validate and publishaction,
+	 * A record containing functions that are run on load, click, draw, exit, validate and publishaction,
 	 * with the original archetype function and parameters passed on to them. If undefined, these are ignored.
 	 * Note that scripthook functions must be loaded before `Female3DCGExtended.js` in `index.html`.
 	 */
@@ -1212,7 +1196,7 @@ interface ModularItemConfig extends ExtendedItemConfig<ModularItemOption> {
 		Chat?: string | ExtendedItemChatCallback<ModularItemOption>;
 	};
 	/**
-	 * A recond containing functions that are run on load, click, draw, exit, and validate, with the original archetype function
+	 * A record containing functions that are run on load, click, draw, exit, and validate, with the original archetype function
 	 * and parameters passed on to them. If undefined, these are ignored.
 	 * Note that scripthook functions must be loaded before `Female3DCGExtended.js` in `index.html`.
 	 */
@@ -1274,7 +1258,7 @@ interface ModularItemOptionConfig extends Omit<ExtendedItemOptionConfig, "Name">
 	Effect?: EffectName[];
 	/** A list of activities enabled by that module */
 	AllowActivity?: ActivityName[];
-	Property?: Omit<ItemProperties, "TypeRecord">;
+	Property?: Omit<ItemPropertiesConfig, "TypeRecord">;
 }
 
 /** Extended item option subtype for modular items */

@@ -44,6 +44,8 @@ export interface API_Chatroom_Data {
 export function transformToChatRoomData(
     chatRoom: ServerChatRoomData,
 ): API_Chatroom_Data {
+    //@ts-ignore need to remove Private and Locked
+    //FIXME: https://github.com/FriendsOfBC/ropeybot/pull/19/files 
     return {
         ...chatRoom,
         Character: chatRoom.Character.map((data) =>

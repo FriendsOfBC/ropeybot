@@ -512,3 +512,18 @@ export const CurrentTime = 0;
 
 // from ChatRoomMapView.js (stubbed)
 export const ChatRoomMapViewGetObjectAtPos = (x: number, y: number): ChatRoomMapObject | null => null;
+
+export function ChatRoomMapViewGetConnectivityDirections(X: number, Y: number, Condition: (X: number, Y: number) => boolean) {
+	return {
+		North: Condition(X, Y - 1),
+		South: Condition(X, Y + 1),
+		East: Condition(X + 1, Y),
+		West: Condition(X - 1, Y)
+	};
+}
+
+//#region addendum, manual updates
+export function InventoryItemHandheldPlushiesSetOptionHook(...args: any[]): any {
+	return null;
+};
+//#endregion
