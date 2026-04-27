@@ -39,6 +39,7 @@ export interface API_Character_Data {
     MemberNumber: number;
     ActivePose: readonly AssetPoseName[];
     WhiteList: number[];
+    BlackList: ServerAccountDataSynced["BlackList"],
     OnlineSharedSettings: CharacterOnlineSharedSettings;
     ItemPermission: ItemPermissionLevel;
     FriendList: number[];
@@ -140,6 +141,9 @@ export class API_Character {
         return this.data.ActivePose.map((p) => {
             return { Name: p };
         });
+    }
+    public get BlackList(): API_Character_Data["BlackList"] {
+        return this.data.BlackList;
     }
     public get WhiteList(): number[] {
         return this.data.WhiteList;
