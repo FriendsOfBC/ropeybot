@@ -318,8 +318,8 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         console.log("Socket reconnect attempt");
     };
 
-    private onSocketDisconnect = () => {
-        console.log("Socket disconnected");
+    private onSocketDisconnect = (reason: Socket.DisconnectReason) => {
+        console.log(`Socket disconnected: ${reason}`);
 
         // clean up existing promises and resolve them if any to prevent a stuck await (i.e. disconnect when waiting for roomJoinPromise)
         if (this.roomJoinPromise) {
@@ -333,6 +333,11 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
 
         this.loggedIn = new PromiseResolve<void>();
         this.roomSynced = new PromiseResolve<void>();
+
+        if (!this.sock.active) {
+            console.log(`Socket inactive due to "${reason}" disconnect, manual reconnect triggered`);
+            this.sock.connect();
+        }
     };
 
     private onServerInfo = (info: ServerInfoMessage) => {
