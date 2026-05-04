@@ -65,6 +65,8 @@ export interface RoomDefinition {
 const GAMEVERSION = "R122";
 const LZSTRING_MAGIC = "╬";
 
+const ServerChatMessageMaxLength = 2000; // from bc-server
+
 class PromiseResolve<T> {
     public prom: Promise<T>;
     public resolve!: (x: T) => void;
@@ -221,9 +223,9 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         target?: number,
         dict?: Record<string, any>[],
     ): void {
-        if (msg.length > 1000) {
+        if (msg.length > ServerChatMessageMaxLength) {
             console.error("Message too long, truncating");
-            msg = msg.substring(0, 1000);
+            msg = msg.substring(0, ServerChatMessageMaxLength);
         }
 
         console.log(`Sending ${type}`, msg);
