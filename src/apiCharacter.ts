@@ -411,11 +411,16 @@ export class API_Character {
     }
 
     public sendItemUpdate(data: BC_AppearanceItem): void {
+        // ref: ChatRoomCharacterItemUpdate() in BC code
+        const item = this.Appearance.InventoryGet(data.Group)?.getData();
         this.connection.updateCharacterItem({
             Target: this.MemberNumber,
-            ...data,
-            Color: data.Color ?? [],
+            Group: data.Group,
+            Name: (item != null) ? item.Name : undefined,
+            Color: (item != null && item.Color != null) ? item.Color : "Default",
             Difficulty: data.Difficulty ?? 0,
+            Property: ((item != null) && (item.Property != null)) ? item.Property : undefined,
+            Craft: ((item != null) && (item.Craft != null)) ? item.Craft : undefined,
         });
     }
 
