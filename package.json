@@ -13,7 +13,7 @@
     },
     "dependencies": {
         "bc-bot": "link:src",
-        "bc-stubs": "127.0.0",
+        "bc-stubs": "128.0.0",
         "lodash": "^4.17.21",
         "lz-string": "^1.5.0",
         "mongodb": "^6.21.0",

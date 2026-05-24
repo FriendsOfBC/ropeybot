@@ -1,3 +1,9 @@
+/** A type representing layer names (yes this is just a `string` alias). */
+type LayerName = string;
+
+/** A special key for {@link ItemProperties["DrawingTop"]}/{@link ItemProperties["DrawingLeft"]} that overrides the _relative_ position of each and every layer individually */
+type AssetOverride = "ASSET_OVERRIDE";
+
 /** The definition of a fetish */
 interface Fetish {
 	Name: FetishName;
@@ -184,7 +190,7 @@ interface AssetCommonPropertiesGroupAssetLayer {
 	 *
 	 * @default false
 	 */
-	InheritPoseMappingFields?: boolean;
+	InheritPoseMappingFields?: true;
 
 	/**
 	 * Whether that layer is colorized
@@ -196,7 +202,7 @@ interface AssetCommonPropertiesGroupAssetLayer {
 	 *
 	 * Mainly useful for inheriting the body color around.
 	 */
-	AllowColorize?: boolean;
+	AllowColorize?: false;
 }
 
 /**
@@ -227,7 +233,7 @@ interface AssetCommonPropertiesGroupAsset {
 	 *
 	 * @default true
 	 */
-	Random?: boolean;
+	Random?: false;
 
 	/**
 	 * Is the asset considered a restraint?
@@ -263,6 +269,9 @@ interface AssetGroupDefinitionBase extends AssetCommonPropertiesGroupAsset, Asse
 	/** The list of assets defined by the group */
 	Asset: (AssetDefinition | string)[];
 
+	/** Inherited from {@link AssetCommonPropertiesGroupAssetLayer} but mandatory here */
+	Priority: number;
+
 	/**
 	 * The type of the group
 	 *
@@ -288,7 +297,7 @@ interface AssetGroupDefinitionBase extends AssetCommonPropertiesGroupAsset, Asse
 	 *
 	 * @default false
 	 */
-	EditOpacity?: boolean;
+	EditOpacity?: true;
 
 	/**
 	 * The default minimum opacity for that group, set value on asset level to override
@@ -315,7 +324,7 @@ interface AssetGroupDefinitionBase extends AssetCommonPropertiesGroupAsset, Asse
 	 *
 	 * @default true
 	 */
-	Default?: boolean;
+	Default?: false;
 
 	/**
 	 * Whether the group is allowed to have no asset
@@ -521,6 +530,7 @@ interface AssetDefinitionBase extends AssetCommonPropertiesGroupAsset, AssetComm
 	StyleOverride?: BodyStyle[];
 	CreateLayerTypesOverride?: number[];
 
+	// Only on BodyStyles
 	DrawOffset?: {
 		Group?: AssetGroupName;
 		Asset?: string;
@@ -889,7 +899,7 @@ interface AssetLayerDefinition extends AssetCommonPropertiesGroupAssetLayer, Ass
 	MirrorExpression?: AssetGroupName;
 	PoseMapping?: AssetPoseMapping;
 	/** Let layer inherit the asset's pose mapping on an individual pose by pose basis, rather than inheriting the pose mapping as a whole (_i.e._ all or nothing) */
-	InheritPoseMappingFields?: boolean;
+	InheritPoseMappingFields?: true;
 
 	/**
 	 * Copy the pose mapping of another layer.
