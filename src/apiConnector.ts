@@ -62,7 +62,7 @@ export interface RoomDefinition {
 }
 
 // What the bot advertises as its game version
-const GAMEVERSION = "R128";
+const GAMEVERSION = "R129";
 const LZSTRING_MAGIC = "╬";
 
 const ServerChatMessageMaxLength = 2000; // from bc-server

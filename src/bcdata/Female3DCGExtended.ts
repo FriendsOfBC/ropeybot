@@ -1322,6 +1322,17 @@ export var AssetFemale3DCGExtended: ExtendedItemMainConfig = {
 				},
 			],
 		}, // CasualDroppedSuit
+		WhiteDress: {
+			Archetype: ExtendedArchetype.MODULAR,
+			DrawImages: false,
+			Modules: [
+				{
+					Name: "HideNipples",
+					Key: "hn",
+					Options: [{ Property: { Hide: ["Nipples"] } }, {}],
+				},
+			],
+		}, // WhiteDress
 	}, // Cloth
 	Decals: {
 		MissMariasManor: {
@@ -16629,7 +16640,7 @@ export var AssetFemale3DCGExtended: ExtendedItemMainConfig = {
 					Options: [
 						{}, // s0 Basic Strap
 						{}, // s1 Head Harness 1
-					]
+					],
 				},
 				{
 					Name: "BallType",
@@ -16638,10 +16649,10 @@ export var AssetFemale3DCGExtended: ExtendedItemMainConfig = {
 						{ Property: { Effect: [E.GagLight] } }, // b0 Regular Size
 						{ Property: { Effect: [E.GagMedium] } }, // b1 Large Size
 						{ Property: { Effect: [E.GagHeavy] } }, // b2 XL Size
-					]
+					],
 				},
 			],
-		}
+		},
 	}, // ItemMouth
 	ItemMouth2: {
 		ClothGag: {
@@ -20514,6 +20525,26 @@ export var AssetFemale3DCGExtended: ExtendedItemMainConfig = {
 				},
 			],
 		}, // PullDownPanties
+		RoyalDiaper: {
+			Archetype: ExtendedArchetype.TYPED,
+			Options: [
+				{
+					Name: "None",
+				},
+				{
+					Name: "Simple",
+				},
+				{
+					Name: "HisMajesty",
+				},
+				{
+					Name: "HerMajesty",
+				},
+				{
+					Name: "Lock",
+				},
+			],
+		}, // RoyalDiaper
 	}, // Panties
 	Glasses: {
 		EyePatch1: {
@@ -21311,6 +21342,15 @@ export var AssetFemale3DCGExtended: ExtendedItemMainConfig = {
 				Chat: "ClothFishnetTopSet",
 			},
 		}, // FishnetTop
+		GlossyBodystocking: {
+			Archetype: "modular",
+			DrawImages: false,
+			Modules: [
+				{ Name: "HandStyle", Key: "h", Options: [{}, {}, {}, {}] },
+				{ Name: "TailorStyle", Key: "m", Options: [{}, {}, {}, {}, {}] },
+				{ Name: "ChestStyle", Key: "b", Options: [{}, {}] },
+			],
+		}, // GlossyBodystocking
 	}, // Suit
 	SuitLower: {
 		MaleSeamlessCatsuit: {
@@ -22483,6 +22523,48 @@ export var AssetFemale3DCGExtended: ExtendedItemMainConfig = {
 				Npc: "InventoryItemNoseNoseRingNPCReaction",
 			},
 		}, // NoseRing
+		NoseShackle: {
+			Archetype: ExtendedArchetype.MODULAR,
+			Modules: [
+				{
+					Name: "Shackle",
+					Key: "s",
+					DrawImages: true,
+					Options: [
+						{ Property: { Difficulty: 11 } }, //s_0 - Single
+						{ Property: { Difficulty: 13 } }, //s_1 - Double
+					],
+				},
+				{
+					Name: "Attachment",
+					Key: "a",
+					DrawImages: true,
+					Options: [
+						{}, //a_0 - None
+						{
+							Prerequisite: ["NotSuspended"],
+							Property: {
+								Effect: [E.Tethered, E.IsChained],
+							},
+						}, //a_1 - Chainlong
+						{
+							Prerequisite: ["NotSuspended"],
+							Property: {
+								SetPose: ["Kneel"],
+								AllowActivePose: [...PoseAllKneeling],
+								Effect: [E.Freeze, E.IsChained],
+							},
+						}, //a_2 - Chainshort
+						{
+							Prerequisite: ["NotSuspended"],
+							Property: {
+								Effect: [E.Leash],
+							},
+						}, //a_3 - Leash
+					],
+				},
+			],
+		}, // NoseShackle
 	}, // ItemNose
 	Wings: {
 		SteampunkWings: {

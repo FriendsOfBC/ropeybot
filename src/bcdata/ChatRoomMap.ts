@@ -130,6 +130,7 @@ export const ChatRoomMapViewObjectList: ChatRoomMapObject[] = [
 	{ ID: 387, Type: "FloorDecorationThemed", Style: "Television", Top: -0.3, Left: 0, Height: 1.3, Width: 1 },
 	{ ID: 388, Type: "FloorDecorationThemed", Style: "TelevisionBack", Top: -0.3, Left: 0, Height: 1.3, Width: 1 },
 	{ ID: 389, Type: "FloorDecorationThemed", Style: "Wardrobe", Top: -0.9, Left: 0, Height: 2, Width: 1 },
+	{ ID: 390, Type: "FloorDecorationThemed", Style: "StandingBellflowerBanner", Top: -1.1, Left: 0.15, Height: 1.7, Width: 0.7 },
 
 	{ ID: 500, Type: "FloorDecorationParty", Style: "Blank" },
 	{ ID: 510, Type: "FloorDecorationParty", Style: "BalloonFiveColor", Top: -0.6, Height: 1.5 },
@@ -610,5 +611,6 @@ export const ChatRoomMapViewObjectList: ChatRoomMapObject[] = [
 	{ ID: 5014, Type: "Banners", Style: "Black", Top: 0.25, Left: 0.25, Height: 0.6, Width: 0.50, },
 	{ ID: 5015, Type: "Banners", Style: "PaladinBanner", Top: 0.25, Left: 0.25, Height: 0.6, Width: 0.50, },
 	{ ID: 5016, Type: "Banners", Style: "ServiOrdinisBanner", Top: 0.25, Left: 0.25, Height: 0.6, Width: 0.50, },
+	{ ID: 5017, Type: "Banners", Style: "BellflowerBanner", Top: 0.25, Left: 0.25, Height: 0.6, Width: 0.50, },
 
 ];

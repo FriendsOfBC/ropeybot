@@ -920,7 +920,24 @@ interface AssetLayerDefinition extends AssetCommonPropertiesGroupAssetLayer, Ass
 	ShowForAttribute?: AssetAttribute[];
 }
 
-type ExtendedArchetype = "modular" | "typed" | "vibrating" | "variableheight" | "text" | "noarch";
+/**
+ * The list of all archetypes and their config and data types.
+ *
+ * @see {@link ExtendedArchetype}
+ */
+interface ExtendedArchetypes {
+	typed: [TypedItemConfig, TypedItemData];
+	modular: [ModularItemConfig, ModularItemData];
+	vibrating: [VibratingItemConfig, VibratingItemData];
+	variableheight: [VariableHeightConfig, VariableHeightData];
+	text: [TextItemConfig, TextItemData];
+	noarch: [NoArchItemConfig, NoArchItemData];
+}
+
+/**
+ * All known archetypes' names
+ */
+type ExtendedArchetype = Prettify<keyof ExtendedArchetypes>;
 
 /**
  * An object containing extended item configurations keyed by group name.
@@ -933,11 +950,16 @@ type ExtendedItemMainConfig = Partial<Record<AssetGroupName, ExtendedItemGroupCo
  */
 type ExtendedItemGroupConfig = Record<string, AssetArchetypeConfig>;
 
+/** Get the archetype config type */
+type AssetArchetypeGetConfig<T extends keyof ExtendedArchetypes> = ExtendedArchetypes[T][0];
+/** Get the archetype data type */
+type AssetArchetypeGetData<T extends keyof ExtendedArchetypes> = ExtendedArchetypes[T][1];
+
 /** A union of all (non-abstract) extended item configs */
-type AssetArchetypeConfig = TypedItemConfig | ModularItemConfig | VibratingItemConfig | VariableHeightConfig | TextItemConfig | NoArchItemConfig;
+type AssetArchetypeConfig = AssetArchetypeGetConfig<keyof ExtendedArchetypes>;
 
 /** A union of all (non-abstract) extended item datas */
-type AssetArchetypeData = TypedItemData | ModularItemData | VibratingItemData | VariableHeightData | TextItemData | NoArchItemData;
+type AssetArchetypeData = AssetArchetypeGetData<keyof ExtendedArchetypes>;
 
 interface ExtendedItemConfig<OptionType extends ExtendedItemOption> {
 	/** The archetype of the extended item config */
