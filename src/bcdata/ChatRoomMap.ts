@@ -131,6 +131,10 @@ export const ChatRoomMapViewObjectList: ChatRoomMapObject[] = [
 	{ ID: 388, Type: "FloorDecorationThemed", Style: "TelevisionBack", Top: -0.3, Left: 0, Height: 1.3, Width: 1 },
 	{ ID: 389, Type: "FloorDecorationThemed", Style: "Wardrobe", Top: -0.9, Left: 0, Height: 2, Width: 1 },
 	{ ID: 390, Type: "FloorDecorationThemed", Style: "StandingBellflowerBanner", Top: -1.1, Left: 0.15, Height: 1.7, Width: 0.7 },
+	{ ID: 391, Type: "FloorDecorationThemed", Style: "BondageClubBanner", Top: -1.1, Left: 0.15, Height: 1.7, Width: 0.7 },
+	{ ID: 392, Type: "FloorDecorationThemed", Style: "VoidOrderBanner", Top: -0.9, Left: 0.13, Height: 1.5, Width: 0.7 },
+	{ ID: 393, Type: "FloorDecorationThemed", Style: "KatanaOnStand", Top: -0.4, Left: 0.1, Height: 1.0, Width: 0.8 },
+	{ ID: 394, Type: "FloorDecorationThemed", Style: "MagicMark", Top: 0.03, Left: 0.05, Height: 0.9, Width: 0.9 },
 
 	{ ID: 500, Type: "FloorDecorationParty", Style: "Blank" },
 	{ ID: 510, Type: "FloorDecorationParty", Style: "BalloonFiveColor", Top: -0.6, Height: 1.5 },
@@ -612,5 +616,11 @@ export const ChatRoomMapViewObjectList: ChatRoomMapObject[] = [
 	{ ID: 5015, Type: "Banners", Style: "PaladinBanner", Top: 0.25, Left: 0.25, Height: 0.6, Width: 0.50, },
 	{ ID: 5016, Type: "Banners", Style: "ServiOrdinisBanner", Top: 0.25, Left: 0.25, Height: 0.6, Width: 0.50, },
 	{ ID: 5017, Type: "Banners", Style: "BellflowerBanner", Top: 0.25, Left: 0.25, Height: 0.6, Width: 0.50, },
+	{ ID: 5018, Type: "Banners", Style: "BondageClub", Top: 0.25, Left: 0.25, Height: 0.6, Width: 0.50, },
+	{ ID: 5019, Type: "Banners", Style: "Inquisition", Top: 0.25, Left: 0.25, Height: 0.6, Width: 0.50, },
+	{ ID: 5020, Type: "Banners", Style: "MagesSacrosanctorum", Top: 0.25, Left: 0.25, Height: 0.6, Width: 0.50, },
+	{ ID: 5021, Type: "Banners", Style: "MaidSorority", Top: 0.25, Left: 0.25, Height: 0.6, Width: 0.50, },
+	{ ID: 5022, Type: "Banners", Style: "Priesthood", Top: 0.25, Left: 0.25, Height: 0.6, Width: 0.50, },
+	{ ID: 5023, Type: "Banners", Style: "VoidOrder", Top: 0.25, Left: 0.25, Height: 0.6, Width: 0.50, },
 
 ];

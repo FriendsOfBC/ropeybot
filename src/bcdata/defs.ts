@@ -498,7 +498,7 @@ export const CommonNoop = undefined;
 export const CommonTime = () => 0;
 
 export const PoseAllKneeling: readonly AssetPoseName[] = Object.freeze(["Kneel", "KneelingSpread"]);
-export const PoseAllStanding: readonly AssetPoseName[] = Object.freeze(["BaseLower", "LegsOpen", "LegsClosed", "Spread"]);
+export const PoseAllStanding: readonly AssetPoseName[] = Object.freeze(["BaseLower", "LegsClosed", "Spread"]);
 
 export const InterfaceTextGet = (x: string) => undefined;
 

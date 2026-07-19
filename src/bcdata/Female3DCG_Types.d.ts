@@ -773,6 +773,8 @@ interface AssetDefinitionBase extends AssetCommonPropertiesGroupAsset, AssetComm
 	ExpressionPrerequisite?: AssetPrerequisite[];
 }
 
+type AssetAppearancePrerequisite = Extract<AssetPrerequisite, PosePrerequisite | "HasBreasts" | "HasFlatChest" | "HasVagina" | "HasPenis">;
+
 /** Input interface for constructing {@link Asset} objects. */
 declare namespace AssetDefinition {
 	/** An {@link AssetDefinition} subtype for assets whose group is of the `Item` category. */
@@ -806,6 +808,9 @@ declare namespace AssetDefinition {
 		SelfBondage?: never;
 		SelfUnlock?: false;
 		Time?: never;
+		Block?: never;
+		// We only allow a specific subset of those for clothing
+		Prerequisite?: AssetAppearancePrerequisite | AssetAppearancePrerequisite[];
 	}
 	/** An {@link AssetDefinition} subtype for assets whose group is of the `Script` category. */
 	interface Script extends AssetDefinitionBase {
