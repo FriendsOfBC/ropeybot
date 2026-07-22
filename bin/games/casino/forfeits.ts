@@ -264,13 +264,11 @@ function makeChaste(character: API_Character, lockMemberNumber: number): void {
         });
         const hairColor =
             character.Appearance.InventoryGet("HairFront").GetColor();
-        const targetColor: BCColor = hairColor.length > 1 ? hairColor[0] as HexColor : hairColor as HexColor;
-        chastityCage.SetColor([
-            "Default",
-            targetColor,
-            targetColor,
-            "#FFBC00",
-        ]);
+        const targetColor: BCColor =
+            hairColor.length > 1
+                ? (hairColor[0] as HexColor)
+                : (hairColor as HexColor);
+        chastityCage.SetColor(["Default", targetColor, targetColor, "#FFBC00"]);
         chastityCage.lock("TimerPasswordPadlock", lockMemberNumber, {
             Password: generatePassword(),
             Hint: "Better luck next time!",

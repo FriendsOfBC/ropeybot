@@ -681,7 +681,7 @@ ${forfeitsString()}
                 char.Appearance.InventoryGet("HairFront").GetColor();
             const added = char.Appearance.AddItem(items[0]);
             try {
-                characterHairColor = characterHairColor[0]as BCColor;
+                characterHairColor = characterHairColor[0] as BCColor;
                 let colors: BCColor[] = [];
                 if (colourLayers) {
                     for (let i = 0; i <= Math.max(...colourLayers); i++) {
