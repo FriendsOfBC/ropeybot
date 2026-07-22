@@ -262,16 +262,14 @@ function makeChaste(character: API_Character, lockMemberNumber: number): void {
                 `After betting and losing at the Pixie Casino, ${character} has lost the privilege to orgasm. ` +
                 `This chastity cage will ensure that the rule is followed.`,
         });
-        let hairColor =
+        const hairColor =
             character.Appearance.InventoryGet("HairFront").GetColor();
-        if (hairColor.length > 1) {
-            hairColor = hairColor[0];
-        }
+        const targetColor: BCColor = hairColor.length > 1 ? hairColor[0] as HexColor : hairColor as HexColor;
         chastityCage.SetColor([
             "Default",
-            hairColor + "",
-            hairColor + "",
-            "FFBC00",
+            targetColor,
+            targetColor,
+            "#FFBC00",
         ]);
         chastityCage.lock("TimerPasswordPadlock", lockMemberNumber, {
             Password: generatePassword(),

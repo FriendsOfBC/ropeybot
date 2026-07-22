@@ -815,7 +815,7 @@ If you would like to make a bot room similar to this one, you can find all neces
 				text = "ERROR";
 			}
 			sign.Extended?.SetText(text);
-			sign.SetColor(["#000000", "#040404", textColor]);
+			sign.SetColor(["#000000", "#040404", textColor as HexColor]);
 		}
 	}
 

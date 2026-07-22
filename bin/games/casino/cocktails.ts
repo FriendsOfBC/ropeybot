@@ -15,7 +15,7 @@
 export interface Cocktail {
     name: string;
     description: string;
-    colour: string;
+    colour: HexColor;
 }
 
 export const COCKTAILS: Record<string, Cocktail> = {

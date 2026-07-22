@@ -645,11 +645,11 @@ ${forfeitsString()}
         return sign;
     }
 
-    public setSignColor(colors: [string, string, string]): void {
+    public setSignColor(colors: [BCColor, BCColor, BCColor]): void {
         this.getSign().SetColor(colors);
     }
 
-    public setTextColor(color: string): void {
+    public setTextColor(color: BCColor): void {
         this.setSignColor(["Default", "Default", color]);
     }
 
@@ -681,8 +681,8 @@ ${forfeitsString()}
                 char.Appearance.InventoryGet("HairFront").GetColor();
             const added = char.Appearance.AddItem(items[0]);
             try {
-                characterHairColor = characterHairColor[0];
-                let colors: string[] = [];
+                characterHairColor = characterHairColor[0]as BCColor;
+                let colors: BCColor[] = [];
                 if (colourLayers) {
                     for (let i = 0; i <= Math.max(...colourLayers); i++) {
                         if (colourLayers.includes(i)) {

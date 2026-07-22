@@ -1373,7 +1373,7 @@ https://github.com/FriendsOfBC/ropeybot
 				text = "ERROR";
 			}
 			sign.Extended?.SetText(text);
-			sign.SetColor(["#000000", "#040404", textColor]);
+			sign.SetColor(["#000000", "#040404", textColor as HexColor]);
 		}
 	}
 
@@ -1709,7 +1709,7 @@ https://github.com/FriendsOfBC/ropeybot
 		rope?.SetDifficulty(20);
 		const gag1 = character.Appearance.AddItem(AssetGet("ItemMouth", "ClothGag"));
 		gag1?.Extended?.SetType("OTM");
-		gag1?.SetColor("#" + randomColor);
+		gag1?.SetColor(("#" + randomColor) as HexColor);
 		gag1.SetDifficulty(20);
 		const gag2 = character.Appearance.AddItem(AssetGet("ItemMouth2", "ClothGag"));
 		gag2?.Extended?.SetType("OTM");
