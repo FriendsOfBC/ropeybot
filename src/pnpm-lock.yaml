@@ -12,8 +12,8 @@ importers:
         specifier: ^3.1.2
         version: 3.1.2
       bc-stubs:
-        specifier: 123.0.0-Beta.3
-        version: 123.0.0-Beta.3
+        specifier: 130.0.0
+        version: 130.0.0
       lz-string:
         specifier: ^1.5.0
         version: 1.5.0
@@ -201,14 +201,17 @@ packages:
   '@socket.io/component-emitter@3.1.2':
     resolution: {integrity: sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==}
 
+  '@total-typescript/ts-reset@0.6.1':
+    resolution: {integrity: sha512-cka47fVSo6lfQDIATYqb/vO1nvFfbPw7uWLayIXIhGETj0wcOOlrlkobOMDNQOFr9QOafegUPq13V2+6vtD7yg==}
+
   '@tsconfig/node18@18.2.6':
     resolution: {integrity: sha512-eAWQzAjPj18tKnDzmWstz4OyWewLUNBm9tdoN9LayzoboRktYx3Enk1ZXPmThj55L7c4VWYq/Bzq0A51znZfhw==}
 
   '@types/node@20.19.27':
     resolution: {integrity: sha512-N2clP5pJhB2YnZJ3PIHFk5RkygRX5WO/5f0WC08tp0wd+sv0rsJk3MqWn3CbNmT2J505a5336jaQj4ph1AdMug==}
 
-  bc-stubs@123.0.0-Beta.3:
-    resolution: {integrity: sha512-RELyHtkCkK4b06YbYwYmVk5IPfZWmzdjQDCaEEjLglxznEf/LXE9444GnUUpQDFJ3wSCWnIUBLNAQUHA/4x/JA==}
+  bc-stubs@130.0.0:
+    resolution: {integrity: sha512-WXbJz9nn6PraZReYPYrDBao5mF8Jtn4xo6hwagjyYeuwdH+e57WwMB8g20pKgTBcbzv2tt/OHgrJcrYfZR2lIA==}
 
   debug@4.3.7:
     resolution: {integrity: sha512-Er2nc/H7RrMXZBFCEim6TCmMk02Z8vLC2Rbi1KEBggpo0fS6l0S1nnapwmIi3yW/+GOJap1Krg4w0Hg80oCqgQ==}
@@ -409,14 +412,17 @@ snapshots:
 
   '@socket.io/component-emitter@3.1.2': {}
 
+  '@total-typescript/ts-reset@0.6.1': {}
+
   '@tsconfig/node18@18.2.6': {}
 
   '@types/node@20.19.27':
     dependencies:
       undici-types: 6.21.0
 
-  bc-stubs@123.0.0-Beta.3:
+  bc-stubs@130.0.0:
     dependencies:
+      '@total-typescript/ts-reset': 0.6.1
       socket.io-client: 4.6.1
     transitivePeerDependencies:
       - bufferutil
