@@ -346,8 +346,8 @@ export class API_Character {
         // See above
         return !Boolean(
             this.Appearance.InventoryGet("ItemMouth") ||
-                this.Appearance.InventoryGet("ItemMouth2") ||
-                this.Appearance.InventoryGet("ItemMouth3"),
+            this.Appearance.InventoryGet("ItemMouth2") ||
+            this.Appearance.InventoryGet("ItemMouth3"),
         );
     }
 

@@ -30,12 +30,10 @@ export interface API_Chatroom_Data {
     Character: API_Character_Data[];
     Admin: number[];
     Ban: number[];
-    Private: boolean;
     Access: ServerChatRoomRole[];
     Visibility: ServerChatRoomRole[];
     Limit: number;
     Background: string;
-    Locked: boolean;
     Space: ServerChatRoomSpace;
     BlockCategory: ServerChatRoomBlockCategory[];
     Game: ServerChatRoomGame;
@@ -130,7 +128,7 @@ export class API_Chatroom extends EventEmitter<ChatRoomEvents> {
         });
     }
     public get Private(): boolean {
-        return this.data.Private;
+        return !this.data.Visibility.includes("All");
     }
     public get Limit(): number {
         return this.data.Limit;
