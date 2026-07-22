@@ -338,7 +338,9 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         this.roomSynced = new PromiseResolve<void>();
 
         if (!this.sock.active) {
-            console.log(`Socket inactive due to "${reason}" disconnect, manual reconnect triggered`);
+            console.log(
+                `Socket inactive due to "${reason}" disconnect, manual reconnect triggered`,
+            );
             this.sock.connect();
         }
     };
@@ -713,7 +715,7 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         this.roomCreatePromise = new PromiseResolve();
 
         const admins = [...roomDef.Admin];
-        if (!(admins.includes(this._player!.MemberNumber)))
+        if (!admins.includes(this._player!.MemberNumber))
             admins.unshift(this._player!.MemberNumber);
         let result;
         try {

@@ -39,8 +39,8 @@ export interface API_Character_Data {
     MemberNumber: number;
     ActivePose: readonly AssetPoseName[];
     WhiteList: number[];
-    BlackList: ServerAccountDataSynced["BlackList"],
-    Reputation: NonNullable<ServerAccountDataSynced["Reputation"]>,
+    BlackList: ServerAccountDataSynced["BlackList"];
+    Reputation: NonNullable<ServerAccountDataSynced["Reputation"]>;
     OnlineSharedSettings: CharacterOnlineSharedSettings;
     ItemPermission: ItemPermissionLevel;
     FriendList: number[];
@@ -179,7 +179,9 @@ export class API_Character {
     // #region Other Misc Character Info
     public get Dominance() {
         if (!this.data.Reputation.length) return 0;
-        return this.data.Reputation.find(r => r.Type === "Dominant")?.Value ?? 0;
+        return (
+            this.data.Reputation.find((r) => r.Type === "Dominant")?.Value ?? 0
+        );
     }
     // #endregion
 
@@ -430,11 +432,14 @@ export class API_Character {
         this.connection.updateCharacterItem({
             Target: this.MemberNumber,
             Group: data.Group,
-            Name: (item != null) ? item.Name : undefined,
-            Color: (item != null && item.Color != null) ? item.Color : "Default",
+            Name: item != null ? item.Name : undefined,
+            Color: item != null && item.Color != null ? item.Color : "Default",
             Difficulty: data.Difficulty ?? 0,
-            Property: ((item != null) && (item.Property != null)) ? item.Property : undefined,
-            Craft: ((item != null) && (item.Craft != null)) ? item.Craft : undefined,
+            Property:
+                item != null && item.Property != null
+                    ? item.Property
+                    : undefined,
+            Craft: item != null && item.Craft != null ? item.Craft : undefined,
         });
     }
 
