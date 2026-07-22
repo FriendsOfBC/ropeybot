@@ -320,6 +320,17 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
 
     private onSocketDisconnect = () => {
         console.log("Socket disconnected");
+
+        // clean up existing promises and resolve them if any to prevent a stuck await (i.e. disconnect when waiting for roomJoinPromise)
+        if (this.roomJoinPromise) {
+            this.roomJoinPromise.resolve("SocketDisconnected");
+            this.roomJoinPromise = undefined;
+        }
+        if (this.roomCreatePromise) {
+            this.roomCreatePromise.resolve("SocketDisconnected");
+            this.roomCreatePromise = undefined;
+        }
+
         this.loggedIn = new PromiseResolve<void>();
         this.roomSynced = new PromiseResolve<void>();
     };
@@ -656,18 +667,20 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
 
         this.roomJoinPromise = new PromiseResolve();
 
+        let result;
         try {
             this.wrappedSock.emit("ChatRoomJoin", {
                 Name: name,
             });
 
-            const joinResult = await this.roomJoinPromise.prom;
-            if (joinResult !== "JoinedRoom") {
-                console.log("Failed to join room", joinResult);
-                return false;
-            }
+            result = await this.roomJoinPromise.prom;
         } finally {
             this.roomJoinPromise = undefined;
+        }
+
+        if (result !== "JoinedRoom") {
+            console.error("Failed to join room", result);
+            return false;
         }
 
         console.log("Room joined");
@@ -704,7 +717,8 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         }
 
         if (result !== "ChatRoomCreated") {
-            throw new API_Error(result, "Failed to create room");
+            console.error("Failed to create room", result);
+            return false;
         }
 
         console.log("Room created");
@@ -718,14 +732,23 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
 
     public async joinOrCreateRoom(roomDef: RoomDefinition): Promise<void> {
         await this.loggedIn.prom;
+        // store a reference to the current instance of PromiseResolve that was
+        // awaited, acting like a session id
+        const logInSession = this.loggedIn;
 
         // after a void, we can race between creating the room and other players
         // reappearing and creating it, so we need to try both until one works
-        while (true) {
+        //
+        // only continue retrying if this joinOrCreateRoom call is still the
+        // active login session and isn't one that has disconnected already
+        while (logInSession === this.loggedIn) {
             console.log("Trying to join room...", roomDef);
             const joinResult = await this.ChatRoomJoin(roomDef.Name);
             if (joinResult) return;
 
+            // relinquish responsibility to the actual active login session if this
+            // joinOrCreateRoom call is from an old disconnected session
+            if (logInSession !== this.loggedIn) return;
             console.log("Failed to join room, trying to create...", roomDef);
             const createResult = await this.ChatRoomCreate(roomDef);
             if (createResult) return;
