@@ -50,7 +50,7 @@ importers:
         version: 4.17.27
       '@types/node':
         specifier: ^20.19.27
-        version: 20.19.27
+        version: 20.19.43
       esbuild:
         specifier: ^0.27.2
         version: 0.27.2
@@ -81,7 +81,7 @@ importers:
         version: 20.1.10
       '@types/node':
         specifier: ^20.19.27
-        version: 20.19.27
+        version: 20.19.43
       esbuild:
         specifier: ^0.27.2
         version: 0.27.2
@@ -265,8 +265,8 @@ packages:
   '@types/lodash@4.17.27':
     resolution: {integrity: sha512-VenMRv/eKNrspX9v3H4dbmjsrnCOYdYBG3kxXKk3dG6X+urBGcj2Prww3xw1U5K4FV/mE4h5GbWd0szEKf+9ew==}
 
-  '@types/node@20.19.27':
-    resolution: {integrity: sha512-N2clP5pJhB2YnZJ3PIHFk5RkygRX5WO/5f0WC08tp0wd+sv0rsJk3MqWn3CbNmT2J505a5336jaQj4ph1AdMug==}
+  '@types/node@20.19.43':
+    resolution: {integrity: sha512-6oYBAi5ikg4Pl+kGsoYtawUMBT2zZMCvPNF7pVLnHZfd1zf38DRiWn/gT01RYCdUqkv7Fhr+C9ot4/tb+2sVvA==}
 
   '@types/webidl-conversions@7.0.3':
     resolution: {integrity: sha512-CiJJvcRtIgzadHCYXw7dqEnMNRjhGZlYK05Mj9OyktqV8uVT8fD2BFOB7S1uwBE3Kj2Z+4UyPmFw/Ixgw/LAlA==}
@@ -556,7 +556,7 @@ snapshots:
 
   '@types/lodash@4.17.27': {}
 
-  '@types/node@20.19.27':
+  '@types/node@20.19.43':
     dependencies:
       undici-types: 6.21.0
 
