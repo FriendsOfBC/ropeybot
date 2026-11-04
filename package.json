@@ -6,9 +6,9 @@
         "preinstall": "cd src && pnpm install",
         "types": "tsc",
         "prettier": "prettier -c .",
-        "compile:bc-bot": "cd src && npm run compile",
-        "bundle": "npm run compile:bc-bot && esbuild bin/main.ts --bundle --platform=node --outfile=dist/bundle.js --sourcemap",
-        "start": "npm run compile:bc-bot && tsx bin/main.ts",
+        "compile:bc-bot": "cd src && pnpm run compile",
+        "bundle": "pnpm run compile:bc-bot && esbuild bin/main.ts --bundle --platform=node --outfile=dist/bundle.js --sourcemap",
+        "start": "pnpm run compile:bc-bot && tsx bin/main.ts",
         "docker": "pnpm run bundle && docker build -t ropeybot --no-cache ."
     },
     "dependencies": {
