@@ -47,7 +47,7 @@ importers:
         version: 20.1.10
       '@types/lodash':
         specifier: ^4.17.21
-        version: 4.17.21
+        version: 4.17.27
       '@types/node':
         specifier: ^20.19.27
         version: 20.19.27
@@ -262,8 +262,8 @@ packages:
   '@tsconfig/node20@20.1.10':
     resolution: {integrity: sha512-5OZgdnxbFuvwm05iVwPXMU5/7iPuVDDZzAnxPDLj+kjN7fwQZSSVgHQhKTNkBPOO6Qef2D5MxPAoPLCGqE2VuQ==}
 
-  '@types/lodash@4.17.21':
-    resolution: {integrity: sha512-FOvQ0YPD5NOfPgMzJihoT+Za5pdkDJWcbpuj1DjaKZIr/gxodQjY/uWEFlTNqW2ugXHUiL8lRQgw63dzKHZdeQ==}
+  '@types/lodash@4.17.27':
+    resolution: {integrity: sha512-VenMRv/eKNrspX9v3H4dbmjsrnCOYdYBG3kxXKk3dG6X+urBGcj2Prww3xw1U5K4FV/mE4h5GbWd0szEKf+9ew==}
 
   '@types/node@20.19.27':
     resolution: {integrity: sha512-N2clP5pJhB2YnZJ3PIHFk5RkygRX5WO/5f0WC08tp0wd+sv0rsJk3MqWn3CbNmT2J505a5336jaQj4ph1AdMug==}
@@ -554,7 +554,7 @@ snapshots:
 
   '@tsconfig/node20@20.1.10': {}
 
-  '@types/lodash@4.17.21': {}
+  '@types/lodash@4.17.27': {}
 
   '@types/node@20.19.27':
     dependencies:
