@@ -1,7 +1,7 @@
 # Data imported from BC that should stay as close as possible to the original
-src/bcdata/*
+packages/bc-bot/src/bcdata/*
 # Code from the bot hub with minimal modifications, kept formatted as they were
-bin/hub/*
+apps/ropeybot/src/hub/*
 
 pnpm-lock.yaml
 src/pnpm-lock.yaml

@@ -1,0 +1,27 @@
+{
+    "name": "ropeybot",
+    "license": "Apache-2.0",
+    "private": "true",
+    "scripts": {
+        "types": "tsc",
+        "build": "esbuild src/main.ts --bundle --platform=node --outfile=dist/bundle.js --sourcemap",
+        "start": "tsx bin/main.ts",
+        "docker": "pnpm run bundle && docker build -t ropeybot --no-cache ."
+    },
+    "dependencies": {
+        "bc-bot": "workspace:*",
+        "bc-stubs": "catalog:",
+        "lz-string": "catalog:",
+        "lodash": "^4.17.21",
+        "mongodb": "^6.21.0",
+        "prom-client": "^14.2.0"
+    },
+    "devDependencies": {
+        "@tsconfig/node20": "^20.1.0",
+        "@types/lodash": "^4.17.21",
+        "@types/node": "^20.19.27",
+        "esbuild": "^0.27.2",
+        "tsx": "^4.21.0",
+        "typescript": "^5.9.3"
+    }
+}

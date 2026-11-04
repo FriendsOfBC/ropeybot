@@ -1,18 +1,22 @@
 {
     "compilerOptions": {
         "allowJs": true,
-        "noEmit": true,
-        "strict": false,
+        "noEmit": false,
+        "strict": true,
         "module": "nodenext",
         "moduleResolution": "nodenext",
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "declaration": true,
+        "outDir": "./dist/",
+        "rewriteRelativeImportExtensions": true,
+        "allowImportingTsExtensions": true
     },
     "extends": "@tsconfig/node20/tsconfig.json",
     "include": [
         "node_modules/bc-stubs/bc/NativeDeclarations/Typedef.d.ts",
         "node_modules/bc-stubs/bc/NativeDeclarations/Messages.d.ts",
         "node_modules/bc-stubs/bc/NativeDeclarations/Female3DCG_Types.d.ts",
-        "bin/**/*"
+        "src/**/*"
     ],
     "ts-node": {
         "files": true

@@ -1,0 +1,12 @@
+linkWorkspacePackages: true
+
+packages:
+    - "apps/*"
+    - "packages/*"
+
+catalog:
+    "bc-stubs": 130.0.0
+    "lz-string": 1.5.0
+
+allowBuilds:
+    esbuild: true

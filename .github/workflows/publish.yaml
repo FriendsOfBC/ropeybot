@@ -19,5 +19,8 @@ jobs:
               with:
                   version: 10
             - name: Install dependencies
-              run: "cd src && pnpm install"
-            - run: "cd src && pnpm publish --provenance --access public --no-git-checks"
+              run: "pnpm install"
+
+            - name: Build & Publish
+              working-directory: packages/bc-/bot
+            - run: "pnpm publish --provenance --access public --no-git-checks"

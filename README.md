@@ -3,6 +3,9 @@
 A node-based BC bot based on the old bot-api. Its functionality is divided up into
 'games' and you configure the bot to run one of them via its config file.
 
+The repository also contains bc-bot, a typescript / javascript library for building
+BC bots. This can be used in isolation in your own app if you just want the library.
+
 Most code here is free to use (Apache licensed) but some is taken with
 permission from the original bot hub (eg. kidnappers game, roleplay challenge).
 
@@ -22,11 +25,16 @@ Usual club ettiquette applies, eg:
 
 ## Code layout
 
-Anything in src/hub is from the original bot hub. This includes the 'kidnappers' game and the
-roleplay challenge bot. These are copied in as they were, but with additions since.
+The code is laid out in a monorepo:
 
-Things in src/games use a newer, more event-based API. If you write new bots, they should
-probably look like the ones in here.
+- **packages/bc-bot**: The bc-bot library
+- **apps/ropeybot**: The bot application
+
+Anything in apps/ropeybot/src/hub is from the original bot hub. This includes the 'kidnappers'
+game and the roleplay challenge bot. These are copied in as they were, but with additions since.
+
+Things in apps/ropeybot/src/games use a newer, more event-based API. If you write new bots,
+they should probably look like the ones in here.
 
 Some things are unfinished and imperfect, but there should be enough here to make working and
 fun bots! Improvements and fixes are always welcome.
@@ -38,16 +46,20 @@ The bot can either be run locally or via the Docker image.
 ### Running Locally
 
 - Get an environment with NodeJS, pnpm (https://pnpm.io/installation) and git
-- Check out the bot's code
+- Check out the bot's code:
   `git clone https://github.com/FriendsOfBC/ropeybot.git`
+- Install dependencies:
+  `pnpm install`
 - Copy `config.sample.json` to `config.json` and customise it: you'll need to provide
   at least a username and password for an account that the bot can log in as. You can
   also choose what game the bot will run.
-- Enter the directory and install the dependencies:
-  `cd ropeybot`
-  `pnpm install`
+- Build the bot:
+  `pnpm run -r build`
 - Start the bot!
-  `pnpm start`
+  `pnpm run -r start`
+
+Building the app will automatically rebuild the bc-bot library too, so any changes
+you make there will be reflected.
 
 ### Running with Docker
 
