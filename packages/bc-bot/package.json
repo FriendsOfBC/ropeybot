@@ -15,8 +15,8 @@
     ],
     "scripts": {
         "types": "tsc",
-        "prepare": "pnpm compile",
-        "compile": "rm -rf dist/* && tsc -p tsconfig.json"
+        "notprepare": "pnpm compile",
+        "build": "rm -rf dist/* && tsc -p tsconfig.json"
     },
     "dependencies": {
         "@socket.io/component-emitter": "^3.1.2",

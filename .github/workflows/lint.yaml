@@ -25,7 +25,8 @@ jobs:
               run: "pnpm run prettier"
 
             - name: Compile library
-              run: "pnpm run -r compile"
+              working-directory: packages/bc-bot
+              run: "pnpm run build"
 
             - name: Check Types
               run: "pnpm run -r types"

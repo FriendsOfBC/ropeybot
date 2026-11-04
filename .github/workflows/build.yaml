@@ -32,8 +32,8 @@ jobs:
             - name: Install dependencies
               run: "pnpm install"
 
-            - name: Bundle
-              run: "pnpm run -r bundle"
+            - name: Build
+              run: "pnpm run -r build"
 
             - name: Extract metadata for Docker
               working-directory: apps/ropeybot
