@@ -67586,7 +67586,7 @@ export var AssetFemale3DCG = [
 				Extended: true,
 				FixedPosition: true,
 				DynamicBeforeDraw: true,
-				DynamicAudio: (C) => InventoryItemDevicesKennelGetAudio(C),
+				//DynamicAudio: (C) => InventoryItemDevicesKennelGetAudio(C),
 				DynamicScriptDraw: true,
 				DrawLocks: false,
 				DefaultColor: ["#2E2E29", "#780E0E", "#2E2E29", "#2E2E29"],

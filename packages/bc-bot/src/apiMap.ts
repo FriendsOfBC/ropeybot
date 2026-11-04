@@ -18,9 +18,9 @@ import { API_Chatroom_Data } from "./apiChatroom.ts";
 import { API_Connector } from "./apiConnector.ts";
 import { EventEmitter } from "node:events";
 import {
-    ChatRoomMapViewObjectList,
-    ChatRoomMapViewTileList,
-} from "./bcdata/ChatRoomMap.ts";
+    AssetsMapDataObjects,
+    AssetsMapDataTiles,
+} from "./bcdata/MapData.js";
 
 export interface MapRegion {
     TopLeft: ChatRoomMapPos;
@@ -30,7 +30,7 @@ export interface MapRegion {
 // https://github.com/FriendsOfBC/ropeybot/issues/4
 function mapTileByName(name: string, type?: string): ChatRoomMapTile | null {
     return (
-        ChatRoomMapViewTileList.find(
+        AssetsMapDataTiles.find(
             (tile) =>
                 (type === undefined || tile.Type === type) &&
                 tile.Style === name,
@@ -40,7 +40,7 @@ function mapTileByName(name: string, type?: string): ChatRoomMapTile | null {
 
 function mapObjectByName(name: string): ChatRoomMapObject | null {
     return (
-        ChatRoomMapViewObjectList.find((tile) => tile.Style === name) ?? null
+        AssetsMapDataObjects.find((tile) => tile.Style === name) ?? null
     );
 }
 
@@ -207,7 +207,7 @@ export class API_Map extends EventEmitter<MapEvents> {
 
         const tileNum = pos.X + pos.Y * 40;
         const objID = this.mapData.Objects?.charCodeAt(tileNum);
-        const obj = ChatRoomMapViewObjectList.find((o) => o.ID === objID);
+        const obj = AssetsMapDataObjects.find((o) => o.ID === objID);
         return obj?.Style ?? null;
     }
 
