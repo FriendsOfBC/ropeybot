@@ -17,6 +17,7 @@ import { API_Character } from "./apiCharacter.ts";
 import { API_Chatroom_Data } from "./apiChatroom.ts";
 import { API_Connector } from "./apiConnector.ts";
 import { EventEmitter } from "node:events";
+import { MapTextUtil } from "./mapText.ts";
 import { AssetsMapDataObjects, AssetsMapDataTiles } from "./bcdata/MapData.js";
 
 export interface MapRegion {
@@ -219,6 +220,25 @@ export class API_Map extends EventEmitter<MapEvents> {
             this.mapData.Objects?.substring(tileNum + 1);
 
         this.queueUpdate();
+    }
+
+    /**
+     * Writes text onto the map as FloorLetter / FloorNumber objects, starting
+     * at the given position and moving right. Whitespace clears the tile's
+     * object; other non-alphanumeric characters are dropped; text running off
+     * the right edge of the map is truncated. If maxWidth is provided, text is
+     * truncated to that width and the remaining tiles are cleared.
+     */
+    public writeText(
+        pos: ChatRoomMapPos,
+        text: string,
+        maxWidth?: number,
+    ): void {
+        const names = MapTextUtil.textToObjectNames(text);
+        const width = Math.min(maxWidth ?? names.length, 40 - pos.X);
+        for (let i = 0; i < width; i++) {
+            this.setObject({ X: pos.X + i, Y: pos.Y }, names[i] ?? "Passable");
+        }
     }
 
     public onCharacterMove(

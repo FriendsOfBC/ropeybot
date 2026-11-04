@@ -139,7 +139,8 @@ export async function startBot(): Promise<RopeyBot> {
                 process.exit(1);
             }
             connector.accountUpdate({ Nickname: "BoatBot" });
-            new Boats(connector, config.boats);
+            const boatsGame = new Boats(connector, config.boats);
+            await boatsGame.init();
             connector.setBotDescription(Boats.description);
             break;
         default:

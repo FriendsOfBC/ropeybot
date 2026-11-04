@@ -234,7 +234,10 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
 
         const payload = { Type: type, Content: msg } as Record<string, any>;
         if (target) payload.Target = target;
-        payload.Dictionary = [...(dict ?? []), { "MsgId": randomBytes(8).toString("hex") }];
+        payload.Dictionary = [
+            ...(dict ?? []),
+            { MsgId: randomBytes(8).toString("hex") },
+        ];
         console.log("Payload dictionary:", payload.Dictionary);
         this.wrappedSock.emit("ChatRoomChat", payload);
     }
