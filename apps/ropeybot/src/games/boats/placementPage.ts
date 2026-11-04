@@ -57,6 +57,34 @@ export function parsePlacements(body: string): BoatPlacement[] | undefined {
     return result;
 }
 
+export function randomPlacements(): BoatPlacement[] {
+    const occupied = new Set<number>();
+    const result: BoatPlacement[] = [];
+    for (const length of BOAT_LENGTHS) {
+        for (;;) {
+            const horizontal = Math.random() < 0.5;
+            const x = Math.floor(
+                Math.random() * (BOARD_SIZE - (horizontal ? length - 1 : 0)),
+            );
+            const y = Math.floor(
+                Math.random() * (BOARD_SIZE - (horizontal ? 0 : length - 1)),
+            );
+            const cells: number[] = [];
+            for (let i = 0; i < length; i++) {
+                cells.push(
+                    (horizontal ? y : y + i) * BOARD_SIZE +
+                        (horizontal ? x + i : x),
+                );
+            }
+            if (cells.some((c) => occupied.has(c))) continue;
+            cells.forEach((c) => occupied.add(c));
+            result.push({ length, x, y, horizontal });
+            break;
+        }
+    }
+    return result;
+}
+
 export function renderPlacementPage(name: string): string {
     return `<!DOCTYPE html>
 <html>

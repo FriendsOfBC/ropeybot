@@ -4,17 +4,21 @@ import {
     CommandParser,
     API_Character,
     BC_Server_ChatRoomMessage,
+    AssetGet,
 } from "bc-bot";
 import { WebServer, type WebRequest, type WebResponse } from "../../webserver";
 import {
     BOARD_SIZE,
+    BOAT_LENGTHS,
     parsePlacements,
+    randomPlacements,
     renderPlacementPage,
     type BoatPlacement,
 } from "./placementPage";
 import { decompressFromBase64 } from "lz-string";
 import { wait } from "../../hub/utils";
 
+const DISCONNECT_TIMEOUT_MS = 2 * 60 * 1000;
 const BOT_POSITION = { X: 0, Y: 39 };
 const GRID_ORIGIN_P1 = { X: 4, Y: 25 };
 const GRID_ORIGIN_P2 = { X: 15, Y: 25 };
@@ -49,6 +53,7 @@ interface BoatsPlayer {
     placement?: BoatPlacement[];
     // Shots this player's board has received, as "x,y"
     shotsReceived: Set<string>;
+    sunkBoats: number;
 }
 
 const MAP =
@@ -67,6 +72,9 @@ Resemblance to any other grid-based naval strategy game be purely coincidental, 
 !join
 Joins the game. You'll be whispered a link to place your boats.
 
+!join random
+Joins the game with a randomly placed fleet, instead of choosing placements yourself.
+
 !fire
 Move onto the square of your opponent's board that you want to target, then use !fire to fire at it.
 `;
@@ -77,6 +85,7 @@ Move onto the square of your opponent's board that you want to target, then use 
     private finished = false;
     private currentPlayer = 0;
     private web: WebServer;
+    private disconnectTimers = new Map<number, ReturnType<typeof setTimeout>>();
 
     public constructor(
         private conn: API_Connector,
@@ -84,10 +93,13 @@ Move onto the square of your opponent's board that you want to target, then use 
     ) {
         this.conn.on("RoomCreate", this.onChatRoomCreated);
         this.conn.on("RoomJoin", this.onChatRoomJoined);
+        this.conn.on("CharacterEntered", this.onCharacterEntered);
+        this.conn.on("CharacterLeft", this.onCharacterLeft);
 
         this.commandParser = new CommandParser(conn);
         this.commandParser.register("join", this.onJoin);
         this.commandParser.register("fire", this.onFire);
+        this.commandParser.register("win", this.onWin);
 
         this.web = new WebServer(config.port);
         this.web.route("/place", (req) => this.placePage(req));
@@ -126,7 +138,70 @@ Move onto the square of your opponent's board that you want to target, then use 
         );
     }
 
+    private onCharacterEntered = (character: API_Character) => {
+        const timer = this.disconnectTimers.get(character.MemberNumber);
+        if (timer) {
+            clearTimeout(timer);
+            this.disconnectTimers.delete(character.MemberNumber);
+        }
+        if (character.IsBot()) {
+            return;
+        }
+        character.Tell(
+            "Whisper",
+            this.started && !this.finished
+                ? "( Welcome to Boats! A game is currently in progress, please wait until it finishes. )"
+                : "( Welcome to Boats! No game is in progress. Use !join to join the game, or !join random to get a randomly placed fleet. )",
+        );
+    };
+
+    private onCharacterLeft = (
+        memberNumber: number,
+        character: API_Character,
+        leaveMessage: string | null,
+        intentional: boolean,
+    ) => {
+        if (!this.players.some((p) => p.memberNumber === memberNumber)) {
+            return;
+        }
+        if (intentional) {
+            this.removePlayer(memberNumber, "left the room");
+            return;
+        }
+        clearTimeout(this.disconnectTimers.get(memberNumber));
+        this.disconnectTimers.set(
+            memberNumber,
+            setTimeout(() => {
+                this.disconnectTimers.delete(memberNumber);
+                this.removePlayer(memberNumber, "disconnected");
+            }, DISCONNECT_TIMEOUT_MS),
+        );
+    };
+
+    private removePlayer(memberNumber: number, reason: string) {
+        const player = this.players.find((p) => p.memberNumber === memberNumber);
+        if (!player) {
+            return;
+        }
+        if (this.started && !this.finished) {
+            this.conn.SendMessage(
+                "Chat",
+                `(${player.name} ${reason}, so the game has been abandoned.`,
+            );
+            this.resetGame();
+            return;
+        }
+        this.players = this.players.filter((p) => p !== player);
+        this.conn.SendMessage(
+            "Emote",
+            `( ${player.name} ${reason} and has been removed from the game. )`,
+        );
+        this.drawPlayerNames();
+    }
+
     private resetGame() {
+        this.disconnectTimers.forEach((t) => clearTimeout(t));
+        this.disconnectTimers.clear();
         this.players = [];
         this.started = false;
         this.finished = false;
@@ -144,8 +219,14 @@ Move onto the square of your opponent's board that you want to target, then use 
     private clearBoard() {
         for (let y = 0; y < 10; y++) {
             for (let x = 0; x < 10; x++) {
-                this.conn.chatRoom.map.setObject({ X: GRID_ORIGIN_P1.X + x, Y: GRID_ORIGIN_P1.Y + y }, "IconEmpty");
-                this.conn.chatRoom.map.setObject({ X: GRID_ORIGIN_P2.X + x, Y: GRID_ORIGIN_P2.Y + y }, "IconEmpty");
+                this.conn.chatRoom.map.setObject(
+                    { X: GRID_ORIGIN_P1.X + x, Y: GRID_ORIGIN_P1.Y + y },
+                    "IconEmpty",
+                );
+                this.conn.chatRoom.map.setObject(
+                    { X: GRID_ORIGIN_P2.X + x, Y: GRID_ORIGIN_P2.Y + y },
+                    "IconEmpty",
+                );
             }
         }
     }
@@ -201,6 +282,10 @@ Move onto the square of your opponent's board that you want to target, then use 
         msg: BC_Server_ChatRoomMessage,
         args: string[],
     ) => {
+        // The finished board stays up until someone joins the next game
+        if (this.finished) {
+            this.resetGame();
+        }
         let player = this.players.find(
             (p) => p.memberNumber === sender.MemberNumber,
         );
@@ -217,6 +302,7 @@ Move onto the square of your opponent's board that you want to target, then use 
                 name: sender.toString(),
                 token: randomBytes(16).toString("hex"),
                 shotsReceived: new Set(),
+                sunkBoats: 0,
             };
             this.players.push(player);
             this.drawPlayerNames();
@@ -224,6 +310,19 @@ Move onto the square of your opponent's board that you want to target, then use 
                 "Emote",
                 `( ${PLAYER_TITLES[Math.floor(Math.random() * PLAYER_TITLES.length)]} ${sender} has joined the game.`,
             );
+        }
+        if (args[0]?.toLowerCase() === "random") {
+            if (player.placement) {
+                this.conn.reply(msg, "You have already placed your boats.");
+                return;
+            }
+            player.placement = randomPlacements();
+            this.conn.SendMessage(
+                "Emote",
+                `( ${player.name} has placed their boats. )`,
+            );
+            this.maybeStart();
+            return;
         }
         sender.Tell(
             "Whisper",
@@ -262,6 +361,114 @@ Move onto the square of your opponent's board that you want to target, then use 
         }
         return cells;
     }
+
+    private applySinkingReward(player: BoatsPlayer): void {
+        const character = this.conn.chatRoom.characters.find(
+            (c) => c.MemberNumber === player.memberNumber,
+        );
+        if (!character) {
+            return;
+        }
+
+        switch (player.sunkBoats) {
+            case 1:
+                character.Appearance.AddItem(
+                    AssetGet("ItemHands", "LatexBondageMitts"),
+                );
+                break;
+            case 2: {
+                const rope = character.Appearance.AddItem(
+                    AssetGet("ItemArms", "HempRope"),
+                );
+                rope.Extended?.SetType("BoxTie");
+                break;
+            }
+            case 3:
+                character.Appearance.AddItem(
+                    AssetGet("ItemBoots", "BalletHeels"),
+                );
+                break;
+            case 4:
+                character.Appearance.AddItem(AssetGet("ItemLegs", "HempRope"));
+                break;
+            case 5: {
+                const rope = character.Appearance.AddItem(
+                    AssetGet("ItemArms", "HempRope"),
+                );
+                rope.Extended?.SetType("Hogtied");
+                character.Appearance.AddItem(
+                    AssetGet("ItemMouth", "ClothStuffing"),
+                );
+                const ballGag = character.Appearance.AddItem(AssetGet("ItemMouth2", "BallGag"));
+                ballGag.Extended.SetType("Tight");
+                break;
+            }
+        }
+    }
+
+    private removeSinkingRewards(player: BoatsPlayer): void {
+        const character = this.conn.chatRoom.characters.find(
+            (c) => c.MemberNumber === player.memberNumber,
+        );
+        if (!character) {
+            return;
+        }
+
+        const rewards = [
+            [1, "ItemHands", "LatexBondageMitts"],
+            [2, "ItemArms", "HempRope"],
+            [3, "ItemBoots", "BalletHeels"],
+            [4, "ItemLegs", "HempRope"],
+            [5, "ItemMouth", "ClothStuffing"],
+            [5, "ItemMouth2", "BallGag"],
+        ] as const;
+        for (const [sunkBoats, group, itemName] of rewards) {
+            if (
+                player.sunkBoats >= sunkBoats &&
+                character.Appearance.InventoryGet(group)?.Name === itemName
+            ) {
+                character.Appearance.RemoveItem(group);
+            }
+        }
+    }
+
+    private endGame(winner: BoatsPlayer, loser: BoatsPlayer): void {
+        this.finished = true;
+        this.conn.SendMessage(
+            "Chat",
+            `(${loser.name}'s entire fleet is destroyed. ${winner.name} wins!`,
+        );
+        this.removeSinkingRewards(winner);
+    }
+
+    // Testing command: immediately wins the game for the sender
+    onWin = async (
+        sender: API_Character,
+        msg: BC_Server_ChatRoomMessage,
+        args: string[],
+    ) => {
+        if (!sender.IsRoomAdmin()) {
+            this.conn.reply(msg, "Only room admins can use this command.");
+            return;
+        }
+        if (!this.started || this.finished) {
+            this.conn.reply(msg, "The game isn't in progress.");
+            return;
+        }
+        const winner = this.players.find(
+            (p) => p.memberNumber === sender.MemberNumber,
+        );
+        if (!winner) {
+            this.conn.reply(msg, "You're not in this game.");
+            return;
+        }
+        const loser = this.players.find((p) => p !== winner)!;
+        while (loser.sunkBoats < BOAT_LENGTHS.length) {
+            loser.sunkBoats++;
+            this.applySinkingReward(loser);
+        }
+        this.endGame(winner, loser);
+    };
 
     onFire = async (
         sender: API_Character,
@@ -324,6 +531,14 @@ Move onto the square of your opponent's board that you want to target, then use 
                 target.shotsReceived.has(`${c.x},${c.y}`),
             );
             if (sunk) {
+                for (const cell of this.boatCells(boat)) {
+                    this.conn.chatRoom.map.setObject(
+                        { X: origin.X + cell.x, Y: origin.Y + cell.y },
+                        "TrashCan",
+                    );
+                }
+                target.sunkBoats++;
+                this.applySinkingReward(target);
                 this.conn.SendMessage(
                     "Chat",
                     `(${attacker.name} has destroyed ${target.name}'s ${BOAT_NAMES[boat.length]}!`,
@@ -341,12 +556,7 @@ Move onto the square of your opponent's board that you want to target, then use 
                     ),
                 )
             ) {
-                this.finished = true;
-                this.conn.SendMessage(
-                    "Chat",
-                    `(${target.name}'s entire fleet is destroyed. ${attacker.name} wins!`,
-                );
-                this.resetGame();
+                this.endGame(attacker, target);
                 return;
             }
         }
