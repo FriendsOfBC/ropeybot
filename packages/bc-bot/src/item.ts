@@ -185,6 +185,8 @@ export class API_AppearanceItem {
         value: ItemProperties[K],
     ): void {
         this.data.Property ??= {};
+        // Types are unhappy because they are set up for r134 object compression which we don't
+        // @ts-ignore
         this.data.Property[prop] = value;
         this.queueUpdate();
     }
@@ -354,11 +356,11 @@ export function getAssetDef(desc: BC_AppearanceItem): AssetDefinition | null {
 
 export function getExtendedAssetDef(
     desc: BC_AppearanceItem,
-): AssetArchetypeConfig | null {
+): AssetArchetypeConfig | undefined {
     const grp = AssetFemale3DCGExtended[desc.Group];
     if (!grp) {
         console.warn("Invalid item group: " + desc.Group);
-        return null;
+        return undefined;
     }
 
     return grp[desc.Name];

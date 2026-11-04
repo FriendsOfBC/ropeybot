@@ -69,6 +69,7 @@ export function transformToCharacterData(
             },
         },
         WheelFortune: "",
+        LockTimerLimit: 0,
     };
     let blockItems: ServerItemPermissionsPacked = {};
     if (Array.isArray(character.BlockItems)) {
