@@ -126,9 +126,28 @@ Move onto the square of your opponent's board that you want to target, then use 
         );
     }
 
-    private resetNames() {
-        this.writePlayerName(0, "Player 1");
-        this.writePlayerName(1, "Player 2");
+    private resetGame() {
+        this.players = [];
+        this.started = false;
+        this.finished = false;
+        this.currentPlayer = 0;
+        this.drawPlayerNames();
+        this.clearBoard();
+    }
+
+    private drawPlayerNames() {
+        for (let i = 0; i < 2; i++) {
+            this.writePlayerName(i, this.players[i]?.name ?? `Player ${i + 1}`);
+        }
+    }
+
+    private clearBoard() {
+        for (let y = 0; y < 10; y++) {
+            for (let x = 0; x < 10; x++) {
+                this.conn.chatRoom.map.setObject({ X: GRID_ORIGIN_P1.X + x, Y: GRID_ORIGIN_P1.Y + y }, "IconEmpty");
+                this.conn.chatRoom.map.setObject({ X: GRID_ORIGIN_P2.X + x, Y: GRID_ORIGIN_P2.Y + y }, "IconEmpty");
+            }
+        }
     }
 
     private setupRoom = async () => {
@@ -136,7 +155,7 @@ Move onto the square of your opponent's board that you want to target, then use 
         this.conn.chatRoom.map.setMapFromData(
             JSON.parse(decompressFromBase64(MAP)),
         );
-        this.resetNames();
+        this.resetGame();
     };
 
     private placePage(req: WebRequest): WebResponse {
@@ -200,7 +219,7 @@ Move onto the square of your opponent's board that you want to target, then use 
                 shotsReceived: new Set(),
             };
             this.players.push(player);
-            this.writePlayerName(this.players.length - 1, player.name);
+            this.drawPlayerNames();
             this.conn.SendMessage(
                 "Emote",
                 `( ${PLAYER_TITLES[Math.floor(Math.random() * PLAYER_TITLES.length)]} ${sender} has joined the game.`,
@@ -290,18 +309,15 @@ Move onto the square of your opponent's board that you want to target, then use 
             this.boatCells(b).some((c) => c.x === square.x && c.y === square.y),
         );
 
-        this.conn.SendMessage(
-            "Chat",
-            `(${attacker.name} fires a salvo!`,
-        );
+        this.conn.SendMessage("Chat", `(${attacker.name} fires a salvo!`);
         await wait(2000);
 
         if (!boat) {
             this.conn.chatRoom.map.setObject(tilePos, "IconCross");
             this.conn.SendMessage(
-            "Chat",
-            `(Plop! ${attacker.name}'s shot misses.`,
-        );
+                "Chat",
+                `(Plop! ${attacker.name}'s shot misses.`,
+            );
         } else {
             this.conn.chatRoom.map.setObject(tilePos, "LogFire");
             const sunk = this.boatCells(boat).every((c) =>
@@ -330,8 +346,7 @@ Move onto the square of your opponent's board that you want to target, then use 
                     "Chat",
                     `(${target.name}'s entire fleet is destroyed. ${attacker.name} wins!`,
                 );
-                this.resetNames();
-                this.players = [];
+                this.resetGame();
                 return;
             }
         }
