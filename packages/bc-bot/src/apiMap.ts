@@ -17,10 +17,7 @@ import { API_Character } from "./apiCharacter.ts";
 import { API_Chatroom_Data } from "./apiChatroom.ts";
 import { API_Connector } from "./apiConnector.ts";
 import { EventEmitter } from "node:events";
-import {
-    AssetsMapDataObjects,
-    AssetsMapDataTiles,
-} from "./bcdata/MapData.js";
+import { AssetsMapDataObjects, AssetsMapDataTiles } from "./bcdata/MapData.js";
 
 export interface MapRegion {
     TopLeft: ChatRoomMapPos;
@@ -39,9 +36,7 @@ function mapTileByName(name: string, type?: string): ChatRoomMapTile | null {
 }
 
 function mapObjectByName(name: string): ChatRoomMapObject | null {
-    return (
-        AssetsMapDataObjects.find((tile) => tile.Style === name) ?? null
-    );
+    return AssetsMapDataObjects.find((tile) => tile.Style === name) ?? null;
 }
 
 interface TileTrigger {
