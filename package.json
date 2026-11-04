@@ -1,0 +1,11 @@
+{
+    "name": "ropeybot-monorepo",
+    "license": "Apache-2.0",
+    "private": "true",
+    "scripts": {
+        "prettier": "prettier -c ."
+    },
+    "devDependencies": {
+        "prettier": "^3.7.4"
+    }
+}

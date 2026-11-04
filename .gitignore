@@ -1,7 +1,8 @@
+/.vscode
 node_modules
-config.json
-dist/
-out
+/apps/ropeybot/config.json
+/packages/bc-bot/dist
+/apps/ropeybot/dist
 
-config*.json
-!config.sample.json
+/apps/ropeybot/config*.json
+!/apps/ropeybot/config.sample.json

@@ -19,9 +19,8 @@
     },
     "dependencies": {
         "@socket.io/component-emitter": "^3.1.2",
-        "bc-stubs": "130.0.0",
-        "lz-string": "^1.5.0",
-        "prettier": "^3.7.4",
+        "bc-stubs": "catalog:",
+        "lz-string": "catalog:",
         "socket.io-client": "^4.8.3"
     },
     "devDependencies": {

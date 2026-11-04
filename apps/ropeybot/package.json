@@ -3,21 +3,17 @@
     "license": "Apache-2.0",
     "private": "true",
     "scripts": {
-        "preinstall": "cd src && pnpm install",
         "types": "tsc",
-        "prettier": "prettier -c .",
-        "compile:bc-bot": "cd src && pnpm run compile",
-        "bundle": "pnpm run compile:bc-bot && esbuild bin/main.ts --bundle --platform=node --outfile=dist/bundle.js --sourcemap",
+        "bundle": "esbuild src/main.ts --bundle --platform=node --outfile=dist/bundle.js --sourcemap",
         "start": "pnpm run compile:bc-bot && tsx bin/main.ts",
         "docker": "pnpm run bundle && docker build -t ropeybot --no-cache ."
     },
     "dependencies": {
-        "bc-bot": "link:src",
-        "bc-stubs": "130.0.0",
+        "bc-bot": "workspace:*",
+        "bc-stubs": "catalog:",
+        "lz-string": "catalog:",
         "lodash": "^4.17.21",
-        "lz-string": "^1.5.0",
         "mongodb": "^6.21.0",
-        "prettier": "^3.7.4",
         "prom-client": "^14.2.0"
     },
     "devDependencies": {

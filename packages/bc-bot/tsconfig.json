@@ -16,7 +16,7 @@
         "node_modules/bc-stubs/bc/NativeDeclarations/Typedef.d.ts",
         "node_modules/bc-stubs/bc/NativeDeclarations/Messages.d.ts",
         "node_modules/bc-stubs/bc/NativeDeclarations/Female3DCG_Types.d.ts",
-        "**/*"
+        "src/**/*"
     ],
     "ts-node": {
         "files": true
