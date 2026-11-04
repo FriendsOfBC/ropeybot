@@ -48,6 +48,9 @@ Rules
    someone or have them spin the bot wheel to choose. Your dare can't involve another specific,
    named person (eg. you can say, "tie a random person", you can't say, "tie Deya").
 6. No "free pass" cards: 'cos skipping a turn is boring!
+7. When applying new dares, be sure to be whispering the Bot if you want them to be secret, otherwise everyone will know what dare you added.
+8. For those that cant arrive at the start: every round finished, if there are new players waiting, they can join in. They will be added at the last spot of the next round so they have time to add their own dares to the Bot while the others play their turns.
+9. For dares you can be as creative as you want but dont make very elaborated RP dares as those would take too long and this game is suposed to be fast.
 `;
 
     private commandParser: CommandParser;
