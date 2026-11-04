@@ -69,6 +69,7 @@ export const PET_EARS: BC_AppearanceItem = {
         TypeRecord: {
             typed: 1,
         },
+        // @ts-ignore - r134 object compression: this uses the wire type which r133 has typed as as minimized (but isn't yet)
         OverridePriority: {
             Base: 0,
         },

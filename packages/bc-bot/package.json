@@ -25,9 +25,9 @@
         "socket.io-client": "^4.8.3"
     },
     "devDependencies": {
-        "@tsconfig/node20": "^20.1.0",
+        "@tsconfig/node24": "^24.0.0",
         "@types/node": "^20.19.27",
-        "esbuild": "^0.27.2",
+        "esbuild": "^0.28.0",
         "tsx": "^4.21.0",
         "typescript": "^5.9.3"
     }

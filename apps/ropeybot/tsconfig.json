@@ -7,11 +7,11 @@
         "moduleResolution": "nodenext",
         "esModuleInterop": true
     },
-    "extends": "@tsconfig/node20/tsconfig.json",
+    "extends": "@tsconfig/node24/tsconfig.json",
     "include": [
-        "node_modules/bc-stubs/bc/NativeDeclarations/Typedef.d.ts",
-        "node_modules/bc-stubs/bc/NativeDeclarations/Messages.d.ts",
-        "node_modules/bc-stubs/bc/NativeDeclarations/Female3DCG_Types.d.ts",
+        "node_modules/bc-stubs/bc/NativeDeclarations/Scripts/Typedef.d.ts",
+        "node_modules/bc-stubs/bc/NativeDeclarations/Scripts/Messages.d.ts",
+        "node_modules/bc-stubs/bc/NativeDeclarations/Assets/Female3DCG_Types.d.ts",
         "src/**/*"
     ],
     "ts-node": {
