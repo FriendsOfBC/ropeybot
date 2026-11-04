@@ -64,6 +64,9 @@ export function AssetsItemDevicesPetBowlAfterDrawHook(...args: any[]): any {
 export function AssetsItemDevicesWoodenBoxAfterDrawHook(...args: any[]): any {
 	return null;
 }
+export function AssetsItemDevicesCardBoardBoxAfterDrawHook(...args: any[]): any {
+	return null;
+}
 export function AssetsItemHeadDroneMaskAfterDrawHook(...args: any[]): any {
 	return null;
 }
@@ -221,6 +224,18 @@ export function InventoryItemVulvaClitAndDildoVibratorbeltDrawHook(...args: any[
 	return null;
 }
 export function InventoryItemVulvaClitAndDildoVibratorbeltSetOptionHook(...args: any[]): any {
+	return null;
+}
+export function InventoryItemVulvaTechnoChastityCageClickHook(...args: any[]): any {
+	return null;
+}
+export function InventoryItemVulvaTechnoChastityCageDrawHook(...args: any[]): any {
+	return null;
+}
+export function InventoryItemVulvaTechnoChastityCageExitHook(...args: any[]): any {
+	return null;
+}
+export function InventoryItemVulvaChastityCageScriptDrawHook(...args: any[]): any {
 	return null;
 }
 export function InventoryItemVulvaFuturisticVibratorClickHook(...args: any[]): any {
@@ -473,6 +488,7 @@ export function VibratorModeGetDrawData(modeSet: readonly VibratorModeSet[], dra
 
 export function CommonConvertArrayToString(x: any[]) { return ""; }
 export const ItemVulvaFuturisticVibratorTriggers = [];
+export const InventoryItemVulvaTechnoChastityCageVoiceTriggers = [];
 export const InventoryItemPelvisSciFiPleasurePantiesChatPrefix = undefined;
 export const AssetsBodyMarkingsBodyWritingsAfterDrawHook = undefined;
 export const InventoryItemBreastForbiddenChastityBraDrawHook = undefined;
@@ -486,6 +502,7 @@ export const InventoryItemNeckFuturisticCollarLoadHook = undefined;
 export const InventoryItemNeckFuturisticCollarDrawHook = undefined;
 export const InventoryItemNeckFuturisticCollarClickHook = undefined;
 export const InventoryItemNeckFuturisticCollarExitHook = undefined;
+export const InventoryItemNeckSlaveCollarInitHook = undefined;
 export const InventoryItemNeckSlaveCollarLoadHook = undefined;
 export const InventoryItemNeckSlaveCollarDrawHook = undefined;
 export const InventoryItemNeckSlaveCollarClickHook = undefined;
