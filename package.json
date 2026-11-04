@@ -21,7 +21,7 @@
         "prom-client": "^14.2.0"
     },
     "devDependencies": {
-        "@tsconfig/node18": "^18.2.6",
+        "@tsconfig/node20": "^20.1.0",
         "@types/lodash": "^4.17.21",
         "@types/node": "^20.19.27",
         "esbuild": "^0.27.2",
