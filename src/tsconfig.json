@@ -11,7 +11,7 @@
         "rewriteRelativeImportExtensions": true,
         "allowImportingTsExtensions": true
     },
-    "extends": "@tsconfig/node18/tsconfig.json",
+    "extends": "@tsconfig/node20/tsconfig.json",
     "include": [
         "node_modules/bc-stubs/bc/NativeDeclarations/Typedef.d.ts",
         "node_modules/bc-stubs/bc/NativeDeclarations/Messages.d.ts",
