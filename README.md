@@ -24,9 +24,11 @@ Usual club ettiquette applies, eg:
 - Make bots fun / interesting / useful, rather than to just sit in rooms.
 
 ## Code layout
+
 The code is laid out in a monorepo:
- * **packages/bc-bot**: The bc-bot library
- * **apps/ropeybot**: The bot application
+
+- **packages/bc-bot**: The bc-bot library
+- **apps/ropeybot**: The bot application
 
 Anything in apps/ropeybot/src/hub is from the original bot hub. This includes the 'kidnappers'
 game and the roleplay challenge bot. These are copied in as they were, but with additions since.
