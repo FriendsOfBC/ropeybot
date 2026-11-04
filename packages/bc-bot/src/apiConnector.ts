@@ -33,6 +33,7 @@ import { BC_Server_ChatRoomMessage } from "./logicEvent.ts";
 import { SocketWrapper } from "./socketWrapper.ts";
 import { wait } from "./util/wait.ts";
 import { API_PlayerCharacter } from "./playerCharacter.ts";
+import { randomBytes } from "node:crypto";
 
 export enum LeaveReason {
     DISCONNECT = "ServerDisconnect",
@@ -233,7 +234,8 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
 
         const payload = { Type: type, Content: msg } as Record<string, any>;
         if (target) payload.Target = target;
-        if (dict) payload.Dictionary = dict;
+        payload.Dictionary = [...(dict ?? []), { "MsgId": randomBytes(8).toString("hex") }];
+        console.log("Payload dictionary:", payload.Dictionary);
         this.wrappedSock.emit("ChatRoomChat", payload);
     }
 

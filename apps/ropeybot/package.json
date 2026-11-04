@@ -5,7 +5,7 @@
     "scripts": {
         "types": "tsc",
         "build": "esbuild src/main.ts --bundle --platform=node --outfile=dist/bundle.js --sourcemap",
-        "start": "tsx bin/main.ts",
+        "start": "tsx src/main.ts",
         "docker": "pnpm run bundle && docker build -t ropeybot --no-cache ."
     },
     "dependencies": {
