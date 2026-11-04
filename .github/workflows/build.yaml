@@ -29,17 +29,14 @@ jobs:
                   username: ${{ github.actor }}
                   password: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: Install library dependencies
-              working-directory: src
-              run: "pnpm install"
-
-            - name: Install app dependencies
+            - name: Install dependencies
               run: "pnpm install"
 
             - name: Bundle
-              run: "pnpm run bundle"
+              run: "pnpm run -r bundle"
 
             - name: Extract metadata for Docker
+              working-directory: apps/ropeybot
               id: meta
               uses: docker/metadata-action@v5
               with:
@@ -49,6 +46,7 @@ jobs:
               uses: docker/setup-buildx-action@v3
 
             - name: Build and push Docker image
+              working-directory: apps/ropeybot
               uses: docker/build-push-action@v6
               with:
                   context: .

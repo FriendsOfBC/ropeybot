@@ -24,11 +24,8 @@ jobs:
             - name: Run Prettier
               run: "pnpm run prettier"
 
-            - name: Install library dependencies
-              run: "cd src && pnpm install"
-
             - name: Compile library
-              run: "cd src && pnpm run compile"
+              run: "pnpm run -r compile"
 
             - name: Check Types
-              run: "pnpm run types"
+              run: "pnpm run -r types"
