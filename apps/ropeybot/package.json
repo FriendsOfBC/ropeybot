@@ -20,7 +20,7 @@
         "@tsconfig/node22": "^22.0.0",
         "@types/lodash": "^4.17.21",
         "@types/node": "^20.19.27",
-        "esbuild": "^0.27.2",
+        "esbuild": "^0.28.0",
         "tsx": "^4.21.0",
         "typescript": "^5.9.3"
     }
