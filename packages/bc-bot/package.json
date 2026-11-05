@@ -14,9 +14,9 @@
         "dist/**"
     ],
     "scripts": {
-        "types": "tsc",
-        "notprepare": "pnpm compile",
-        "build": "rm -rf dist/* && tsc -p tsconfig.json"
+        "types": "tsgo --noEmit",
+        "prepare": "pnpm build",
+        "build": "rm -rf dist/* && tsgo"
     },
     "dependencies": {
         "@socket.io/component-emitter": "^3.1.2",
@@ -27,7 +27,7 @@
     "devDependencies": {
         "@tsconfig/node24": "^24.0.0",
         "@types/node": "^20.19.27",
-        "tsx": "^4.21.0",
-        "typescript": "^5.9.3"
+        "@typescript/native-preview": "7.0.0-dev.20260707.2",
+        "tsx": "^4.21.0"
     }
 }
