@@ -237,6 +237,19 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         this.wrappedSock.emit("ChatRoomChat", payload);
     }
 
+    public SendBCPMessage(
+        message: { message: string; [key: string]: unknown },
+        target?: number,
+    ): void {
+        const payload: Record<string, unknown> = {
+            Type: "Hidden",
+            Content: "BCP",
+            Dictionary: message,
+        };
+        if (target !== undefined) payload.Target = target;
+        this.wrappedSock.emit("ChatRoomChat", payload as Record<string, any>);
+    }
+
     public reply(orig: BC_Server_ChatRoomMessage, reply: string): void {
         const prefix = this.chatRoom?.usesMaps() ? "(" : "";
 
