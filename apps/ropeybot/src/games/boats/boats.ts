@@ -440,19 +440,19 @@ Move onto the square of your opponent's board that you want to target, then use 
                 character.Appearance.AddItem(AssetGet("ItemLegs", "HempRope"));
                 break;
             case 5: {
-                if (!this.stakes) {
-                    const rope = character.Appearance.AddItem(
-                        AssetGet("ItemArms", "HempRope"),
-                    );
-                    rope.Extended?.SetType("Hogtied");
-                    character.Appearance.AddItem(
-                        AssetGet("ItemMouth", "ClothStuffing"),
-                    );
-                    const ballGag = character.Appearance.AddItem(
-                        AssetGet("ItemMouth2", "BallGag"),
-                    );
-                    ballGag.Extended.SetType("Tight");
-                }
+                if (this.stakes?.type === "outfit") break;
+
+                const rope = character.Appearance.AddItem(
+                    AssetGet("ItemArms", "HempRope"),
+                );
+                rope.Extended?.SetType("Hogtied");
+                character.Appearance.AddItem(
+                    AssetGet("ItemMouth", "ClothStuffing"),
+                );
+                const ballGag = character.Appearance.AddItem(
+                    AssetGet("ItemMouth2", "BallGag"),
+                );
+                ballGag.Extended.SetType("Tight");
                 break;
             }
         }
@@ -511,10 +511,10 @@ Move onto the square of your opponent's board that you want to target, then use 
             return;
         }
 
-        this.removeSinkingRewards(loser);
-
         try {
             if (stakes.type === "outfit") {
+                this.removeSinkingRewards(loser);
+
                 this.conn.SendMessage(
                     "Emote",
                     `( ${loser.name}, prepare to receive your agreed outfit. )`,
