@@ -19,11 +19,20 @@ import { API_Connector } from "./index.ts";
 const MAX_OFFER_CODE_LENGTH = 30_000;
 const MAX_DECOMPRESSED_LENGTH = 2_000_000;
 
+export interface BCPlusContract {
+    title: string;
+    author: number;
+    durationMin: number;
+    policy: "either" | "author";
+    rules: Record<string, unknown>;
+    [key: string]: unknown;
+}
+
 /**
- * Sends a BC+ contract offer code to a character in the current room.
- * Throws when the code is malformed or is not a BC+ contract offer.
+ * Parses a BC+ contract offer code.
+ * Throws when the code is malformed, or is not a BC+ contract offer.
  */
-export function offerBCPlusContract(connection: API_Connector, target: API_Character, offerCode: string): void {
+export function parseBCPlusContract(offerCode: string): BCPlusContract {
     const code = offerCode.trim();
     if (code.length > MAX_OFFER_CODE_LENGTH) {
         throw new TypeError("BC+ contract offer code is too long");
@@ -64,5 +73,12 @@ export function offerBCPlusContract(connection: API_Connector, target: API_Chara
         throw new TypeError("Code does not contain a BC+ contract offer");
     }
 
+    return contract as BCPlusContract;
+}
+
+/**
+ * Sends a parsed BC+ contract offer to a character in the current room.
+ */
+export function offerBCPlusContract(connection: API_Connector, target: API_Character, contract: BCPlusContract): void {
     connection.SendBCPMessage({ message: "ContractOffer", payload: contract }, target.MemberNumber);
 }

@@ -7,6 +7,8 @@ import {
     AssetGet,
     importBundle,
     offerBCPlusContract,
+    parseBCPlusContract,
+    type BCPlusContract,
 } from "bc-bot";
 import { WebServer, type WebRequest, type WebResponse } from "../../webserver";
 import {
@@ -63,6 +65,7 @@ const CONTRACT_PREFIX = "BCP1:contract:";
 interface Stakes {
     type: "outfit" | "contract";
     code: string;
+    contract?: BCPlusContract;
     proposer: number;
     accepted: boolean;
 }
@@ -371,7 +374,7 @@ Move onto the square of your opponent's board that you want to target, then use 
         }
         this.conn.SendMessage(
             "Chat",
-            `(Both players have placed their boats! Use !stakes <outfit code or BC+ contradt code> to propose stakes, or !start to begin the game.` +
+            `(Both players have placed their boats! Use !stakes <outfit code or BC+ contract code> to propose stakes, or !start to begin the game.` +
                 (this.stakes && !this.stakes.accepted
                     ? " The proposed stakes must be accepted with !stakes accept first."
                     : ""),
@@ -523,7 +526,7 @@ Move onto the square of your opponent's board that you want to target, then use 
                     importBundle(stakes.code),
                 );
             } else {
-                offerBCPlusContract(this.conn, character, stakes.code);
+                offerBCPlusContract(this.conn, character, stakes.contract!);
                 this.conn.SendMessage(
                     "Emote",
                     `( ${loser.name} has been sent the contract agreed in the stakes. )`,
@@ -667,8 +670,25 @@ Move onto the square of your opponent's board that you want to target, then use 
         }
 
         let type: Stakes["type"];
+        let contract: BCPlusContract | undefined;
         if (arg.startsWith(CONTRACT_PREFIX)) {
             type = "contract";
+            try {
+                contract = parseBCPlusContract(arg);
+                if ((!contract.durationMin || contract.durationMin <= 0) && contract.policy === "author") {
+                    this.conn.reply(
+                        msg,
+                        "BC+ contracts used as stakes must have a duration or be endable by the signer: the bot will not end them!",
+                    );
+                    return;
+                }
+            } catch (e) {
+                this.conn.reply(
+                    msg,
+                    `That isn't a valid BC+ contract code: ${e instanceof Error ? e.message : e}`,
+                );
+                return;
+            }
         } else {
             type = "outfit";
             try {
@@ -683,6 +703,7 @@ Move onto the square of your opponent's board that you want to target, then use 
         this.stakes = {
             type,
             code: arg,
+            contract,
             proposer: player.memberNumber,
             accepted: false,
         };
