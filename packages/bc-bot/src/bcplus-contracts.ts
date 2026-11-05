@@ -18,7 +18,6 @@ import { API_Connector } from "./index.ts";
 
 const MAX_OFFER_CODE_LENGTH = 30_000;
 const MAX_DECOMPRESSED_LENGTH = 2_000_000;
-const BCP_ACTION_TAG = 'MISSING TEXT IN "ActivityDictionary.csv": BCPAction';
 
 /**
  * Sends a BC+ contract offer code to a character in the current room.
