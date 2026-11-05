@@ -55,20 +55,24 @@ export function parseBCPlusContract(offerCode: string): BCPlusContract {
         throw new TypeError("Invalid BC+ contract payload", { cause: error });
     }
 
-    if (typeof payload !== "object" || payload === null || Array.isArray(payload)) {
+    if (
+        typeof payload !== "object" ||
+        payload === null ||
+        Array.isArray(payload)
+    ) {
         throw new TypeError("Code does not contain a BC+ contract offer");
     }
 
     const contract = payload as Record<string, unknown>;
     if (
-        typeof contract.title !== "string"
-        || contract.title.trim().length === 0
-        || typeof contract.author !== "number"
-        || !Number.isInteger(contract.author)
-        || contract.author < 0
-        || typeof contract.rules !== "object"
-        || contract.rules === null
-        || Array.isArray(contract.rules)
+        typeof contract.title !== "string" ||
+        contract.title.trim().length === 0 ||
+        typeof contract.author !== "number" ||
+        !Number.isInteger(contract.author) ||
+        contract.author < 0 ||
+        typeof contract.rules !== "object" ||
+        contract.rules === null ||
+        Array.isArray(contract.rules)
     ) {
         throw new TypeError("Code does not contain a BC+ contract offer");
     }
