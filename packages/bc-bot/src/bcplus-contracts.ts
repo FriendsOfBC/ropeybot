@@ -24,7 +24,11 @@ const BCP_ACTION_TAG = 'MISSING TEXT IN "ActivityDictionary.csv": BCPAction';
  * Sends a BC+ contract offer code to a character in the current room.
  * Throws when the code is malformed or is not a BC+ contract offer.
  */
-export function offerBCPlusContract(connection: API_Connector, target: API_Character, offerCode: string): void {
+export function offerBCPlusContract(
+    connection: API_Connector,
+    target: API_Character,
+    offerCode: string,
+): void {
     const code = offerCode.trim();
     if (code.length > MAX_OFFER_CODE_LENGTH) {
         throw new TypeError("BC+ contract offer code is too long");
@@ -47,24 +51,31 @@ export function offerBCPlusContract(connection: API_Connector, target: API_Chara
         throw new TypeError("Invalid BC+ contract payload", { cause: error });
     }
 
-    if (typeof payload !== "object" || payload === null || Array.isArray(payload)) {
+    if (
+        typeof payload !== "object" ||
+        payload === null ||
+        Array.isArray(payload)
+    ) {
         throw new TypeError("Code does not contain a BC+ contract offer");
     }
 
     const contract = payload as Record<string, unknown>;
     if (
-        typeof contract.title !== "string"
-        || contract.title.trim().length === 0
-        || typeof contract.author !== "number"
-        || !Number.isInteger(contract.author)
-        || contract.author < 0
-        || typeof contract.rules !== "object"
-        || contract.rules === null
-        || Array.isArray(contract.rules)
+        typeof contract.title !== "string" ||
+        contract.title.trim().length === 0 ||
+        typeof contract.author !== "number" ||
+        !Number.isInteger(contract.author) ||
+        contract.author < 0 ||
+        typeof contract.rules !== "object" ||
+        contract.rules === null ||
+        Array.isArray(contract.rules)
     ) {
         throw new TypeError("Code does not contain a BC+ contract offer");
     }
 
     const title = contract.title.trim().slice(0, 60);
-    connection.SendBCPMessage({ message: "ContractOffer", payload: contract }, target.MemberNumber);
+    connection.SendBCPMessage(
+        { message: "ContractOffer", payload: contract },
+        target.MemberNumber,
+    );
 }
