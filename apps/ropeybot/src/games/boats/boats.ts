@@ -122,6 +122,11 @@ Move onto the square of your opponent's board that you want to target, then use 
         this.commandParser.register("win", this.onWin);
         this.commandParser.register("start", this.onStart);
         this.commandParser.register("stakes", this.onStakes);
+        /*
+        this.commandParser.register("testcontract", (sender, args) => {
+            offerBCPlusContract(this.conn, sender, "BCP1:contract:N4IgLglmA2CmIC5ywM5hAGmQJwLYsRExABMBXbAQ0gHsA7AWQjsQAYsAHG6CAYwE9CsKAAtY2YtjJwCCUFFj4AdADNssYXQDmAeTBjss0JV6QAbvARgpsLLDoqa2XpetlbIaDS2I3HynR0NGR0Lr42WGQosADiXgBGlNDh7ljRYJDaRiBJXgDuAKKUKIIIKknRAL7VWJRk+k6IAIxNABxNAJwdtfUiTgBylLiWIAXQPPCVQA");
+        });
+        */
 
         this.web = new WebServer(config.port);
         this.web.route("/place", (req) => this.placePage(req));
@@ -435,17 +440,19 @@ Move onto the square of your opponent's board that you want to target, then use 
                 character.Appearance.AddItem(AssetGet("ItemLegs", "HempRope"));
                 break;
             case 5: {
-                const rope = character.Appearance.AddItem(
-                    AssetGet("ItemArms", "HempRope"),
-                );
-                rope.Extended?.SetType("Hogtied");
-                character.Appearance.AddItem(
-                    AssetGet("ItemMouth", "ClothStuffing"),
-                );
-                const ballGag = character.Appearance.AddItem(
-                    AssetGet("ItemMouth2", "BallGag"),
-                );
-                ballGag.Extended.SetType("Tight");
+                if (!this.stakes) {
+                    const rope = character.Appearance.AddItem(
+                        AssetGet("ItemArms", "HempRope"),
+                    );
+                    rope.Extended?.SetType("Hogtied");
+                    character.Appearance.AddItem(
+                        AssetGet("ItemMouth", "ClothStuffing"),
+                    );
+                    const ballGag = character.Appearance.AddItem(
+                        AssetGet("ItemMouth2", "BallGag"),
+                    );
+                    ballGag.Extended.SetType("Tight");
+                }
                 break;
             }
         }
@@ -503,20 +510,23 @@ Move onto the square of your opponent's board that you want to target, then use 
             );
             return;
         }
+
+        this.removeSinkingRewards(loser);
+
         try {
             if (stakes.type === "outfit") {
-                character.Appearance.slowlyApplyBundle(
-                    importBundle(stakes.code),
-                );
                 this.conn.SendMessage(
                     "Emote",
-                    `( The stakes are paid! ${loser.name} is dressed in the winner's chosen outfit. )`,
+                    `( ${loser.name}, prepare to receive your agreed outfit. )`,
+                );
+                character.Appearance.slowlyApplyBundle(
+                    importBundle(stakes.code),
                 );
             } else {
                 offerBCPlusContract(this.conn, character, stakes.code);
                 this.conn.SendMessage(
                     "Emote",
-                    `( The stakes are paid! ${loser.name} has been offered the winner's contract. )`,
+                    `( ${loser.name} has been sent the contract agreed in the stakes. )`,
                 );
             }
         } catch (e) {
