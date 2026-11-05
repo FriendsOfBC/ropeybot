@@ -64,6 +64,5 @@ export function offerBCPlusContract(connection: API_Connector, target: API_Chara
         throw new TypeError("Code does not contain a BC+ contract offer");
     }
 
-    const title = contract.title.trim().slice(0, 60);
     connection.SendBCPMessage({ message: "ContractOffer", payload: contract }, target.MemberNumber);
 }
