@@ -5,6 +5,8 @@ import {
     API_Character,
     BC_Server_ChatRoomMessage,
     AssetGet,
+    importBundle,
+    offerBCPlusContract,
 } from "bc-bot";
 import { WebServer, type WebRequest, type WebResponse } from "../../webserver";
 import {
@@ -56,6 +58,15 @@ interface BoatsPlayer {
     sunkBoats: number;
 }
 
+const CONTRACT_PREFIX = "BCP1:contract:";
+
+interface Stakes {
+    type: "outfit" | "contract";
+    code: string;
+    proposer: number;
+    accepted: boolean;
+}
+
 const MAP =
     "N4IgKgngDgpiBcICCAbA7gQwgZxAGnAEsUZdEATSq6m2u+hxp5l1t9jzr7n3v/gYKHCRoseImSp0mbLnzugJpBlK1WvUbFTRQCq9+g4aNGtjXcYuW9phuav2DN+ncAsQG/cedAYJ++/+pzpXDxDvP3CA7X0Q0PCI6yi9GM84/wSzaOS3MNSvSIykrJcc1PzbTKySuLLnCuSq+J1A2mDK3J8aoLqYhrSmxIdB5po7Qfth6lGxywmqKenjWcp5hcMl8nwQAHkAIwArGABjABcyEAULy6vrm9u7+4fHp+eX17f3j8+v75/fv/+AYCgXcAHYCTYAYRgKBQABEMMcMAhgABfFFAA=@EAApAIABfwb/e/9//284fg==";
 
@@ -75,6 +86,14 @@ Joins the game. You'll be whispered a link to place your boats.
 !join random
 Joins the game with a randomly placed fleet, instead of choosing placements yourself.
 
+!stakes <outfit code or BC+ contract code>
+Proposes stakes for the game: the loser will have the outfit applied, or be offered the contract.
+The other player must use !stakes accept before the game can start.
+Use the command again to change the stakes, or !stakes none to cancel them.
+
+!start
+Starts the game once both players have placed their boats.
+
 !fire
 Move onto the square of your opponent's board that you want to target, then use !fire to fire at it.
 `;
@@ -82,6 +101,7 @@ Move onto the square of your opponent's board that you want to target, then use 
     private commandParser: CommandParser;
     private players: BoatsPlayer[] = [];
     private started = false;
+    private stakes?: Stakes;
     private finished = false;
     private currentPlayer = 0;
     private web: WebServer;
@@ -100,6 +120,8 @@ Move onto the square of your opponent's board that you want to target, then use 
         this.commandParser.register("join", this.onJoin);
         this.commandParser.register("fire", this.onFire);
         this.commandParser.register("win", this.onWin);
+        this.commandParser.register("start", this.onStart);
+        this.commandParser.register("stakes", this.onStakes);
 
         this.web = new WebServer(config.port);
         this.web.route("/place", (req) => this.placePage(req));
@@ -150,8 +172,8 @@ Move onto the square of your opponent's board that you want to target, then use 
         character.Tell(
             "Whisper",
             this.started && !this.finished
-                ? "( Welcome to Boats! A game is currently in progress, please wait until it finishes. )"
-                : "( Welcome to Boats! No game is in progress. Use !join to join the game, or !join random to get a randomly placed fleet. )",
+                ? "( Welcome to BondageBoats! A game is currently in progress, please wait until it finishes. )"
+                : "( Welcome to BondageBoats! No game is in progress. Use !join to join the game, or !join random to get a randomly placed fleet. )",
         );
     };
 
@@ -179,7 +201,9 @@ Move onto the square of your opponent's board that you want to target, then use 
     };
 
     private removePlayer(memberNumber: number, reason: string) {
-        const player = this.players.find((p) => p.memberNumber === memberNumber);
+        const player = this.players.find(
+            (p) => p.memberNumber === memberNumber,
+        );
         if (!player) {
             return;
         }
@@ -192,6 +216,7 @@ Move onto the square of your opponent's board that you want to target, then use 
             return;
         }
         this.players = this.players.filter((p) => p !== player);
+        this.stakes = undefined;
         this.conn.SendMessage(
             "Emote",
             `( ${player.name} ${reason} and has been removed from the game. )`,
@@ -205,6 +230,7 @@ Move onto the square of your opponent's board that you want to target, then use 
         this.players = [];
         this.started = false;
         this.finished = false;
+        this.stakes = undefined;
         this.currentPlayer = 0;
         this.drawPlayerNames();
         this.clearBoard();
@@ -263,7 +289,7 @@ Move onto the square of your opponent's board that you want to target, then use 
                 "Emote",
                 `( ${player.name} has placed their boats. )`,
             );
-            this.maybeStart();
+            this.maybeAnnounceStart();
             return { status: 200, body: "OK" };
         }
         if (req.method !== "GET") {
@@ -321,7 +347,7 @@ Move onto the square of your opponent's board that you want to target, then use 
                 "Emote",
                 `( ${player.name} has placed their boats. )`,
             );
-            this.maybeStart();
+            this.maybeAnnounceStart();
             return;
         }
         sender.Tell(
@@ -330,7 +356,24 @@ Move onto the square of your opponent's board that you want to target, then use 
         );
     };
 
-    private maybeStart(): void {
+    private maybeAnnounceStart(): void {
+        if (
+            this.started ||
+            this.players.length !== 2 ||
+            !this.players.every((p) => p.placement)
+        ) {
+            return;
+        }
+        this.conn.SendMessage(
+            "Chat",
+            `(Both players have placed their boats! Use !stakes <outfit code or BC+ contradt code> to propose stakes, or !start to begin the game.` +
+                (this.stakes && !this.stakes.accepted
+                    ? " The proposed stakes must be accepted with !stakes accept first."
+                    : ""),
+        );
+    }
+
+    private start(): void {
         if (
             this.started ||
             this.players.length !== 2 ||
@@ -399,7 +442,9 @@ Move onto the square of your opponent's board that you want to target, then use 
                 character.Appearance.AddItem(
                     AssetGet("ItemMouth", "ClothStuffing"),
                 );
-                const ballGag = character.Appearance.AddItem(AssetGet("ItemMouth2", "BallGag"));
+                const ballGag = character.Appearance.AddItem(
+                    AssetGet("ItemMouth2", "BallGag"),
+                );
                 ballGag.Extended.SetType("Tight");
                 break;
             }
@@ -439,6 +484,47 @@ Move onto the square of your opponent's board that you want to target, then use 
             `(${loser.name}'s entire fleet is destroyed. ${winner.name} wins!`,
         );
         this.removeSinkingRewards(winner);
+        this.applyStakes(loser);
+    }
+
+    private applyStakes(loser: BoatsPlayer): void {
+        const stakes = this.stakes;
+        this.stakes = undefined;
+        if (!stakes) {
+            return;
+        }
+        const character = this.conn.chatRoom.characters.find(
+            (c) => c.MemberNumber === loser.memberNumber,
+        );
+        if (!character) {
+            this.conn.SendMessage(
+                "Emote",
+                `( ${loser.name} is no longer here, so the stakes cannot be applied. )`,
+            );
+            return;
+        }
+        try {
+            if (stakes.type === "outfit") {
+                character.Appearance.slowlyApplyBundle(
+                    importBundle(stakes.code),
+                );
+                this.conn.SendMessage(
+                    "Emote",
+                    `( The stakes are paid! ${loser.name} is dressed in the winner's chosen outfit. )`,
+                );
+            } else {
+                offerBCPlusContract(this.conn, character, stakes.code);
+                this.conn.SendMessage(
+                    "Emote",
+                    `( The stakes are paid! ${loser.name} has been offered the winner's contract. )`,
+                );
+            }
+        } catch (e) {
+            this.conn.SendMessage(
+                "Emote",
+                `( The stakes could not be applied to ${loser.name}. )`,
+            );
+        }
     }
 
     // Testing command: immediately wins the game for the sender
@@ -468,6 +554,136 @@ Move onto the square of your opponent's board that you want to target, then use 
             this.applySinkingReward(loser);
         }
         this.endGame(winner, loser);
+    };
+
+    onStart = async (
+        sender: API_Character,
+        msg: BC_Server_ChatRoomMessage,
+        args: string[],
+    ) => {
+        const player = this.players.find(
+            (p) => p.memberNumber === sender.MemberNumber,
+        );
+        if (!player) {
+            this.conn.reply(msg, "You're not in this game.");
+            return;
+        }
+        if (this.started) {
+            this.conn.reply(msg, "The game has already started.");
+            return;
+        }
+        if (this.players.length !== 2) {
+            this.conn.reply(msg, "Both players must be in the game to start.");
+            return;
+        }
+        if (!this.players.every((p) => p.placement)) {
+            this.conn.reply(msg, "Both players must have placed their boats.");
+            return;
+        }
+        if (this.stakes && !this.stakes.accepted) {
+            this.conn.reply(
+                msg,
+                "The proposed stakes must be accepted by the other player with !stakes accept first (or cancelled with !stakes none).",
+            );
+            return;
+        }
+        this.start();
+    };
+
+    onStakes = async (
+        sender: API_Character,
+        msg: BC_Server_ChatRoomMessage,
+        args: string[],
+    ) => {
+        const player = this.players.find(
+            (p) => p.memberNumber === sender.MemberNumber,
+        );
+        if (!player) {
+            this.conn.reply(msg, "You're not in this game.");
+            return;
+        }
+        if (this.started) {
+            this.conn.reply(
+                msg,
+                "Stakes can't be changed once the game has started.",
+            );
+            return;
+        }
+        const arg = args.join(" ").trim();
+        if (!arg) {
+            this.conn.reply(
+                msg,
+                "Usage: !stakes <outfit code or BC+ contract code>, !stakes accept, or !stakes none",
+            );
+            return;
+        }
+        const keyword = arg.toLowerCase();
+
+        if (keyword === "none") {
+            if (!this.stakes) {
+                this.conn.reply(msg, "There are no stakes to cancel.");
+                return;
+            }
+            this.stakes = undefined;
+            this.conn.SendMessage(
+                "Emote",
+                `( ${player.name} has cancelled the stakes. )`,
+            );
+            return;
+        }
+
+        if (keyword === "accept") {
+            if (!this.stakes) {
+                this.conn.reply(msg, "There are no stakes to accept.");
+                return;
+            }
+            if (this.stakes.proposer === player.memberNumber) {
+                this.conn.reply(
+                    msg,
+                    "The other player must accept your stakes.",
+                );
+                return;
+            }
+            if (this.stakes.accepted) {
+                this.conn.reply(msg, "The stakes are already accepted.");
+                return;
+            }
+            this.stakes.accepted = true;
+            this.conn.SendMessage(
+                "Emote",
+                `( ${player.name} has accepted the stakes. )`,
+            );
+            return;
+        }
+
+        let type: Stakes["type"];
+        if (arg.startsWith(CONTRACT_PREFIX)) {
+            type = "contract";
+        } else {
+            type = "outfit";
+            try {
+                if (!Array.isArray(importBundle(arg))) {
+                    throw new TypeError("Not an outfit");
+                }
+            } catch {
+                this.conn.reply(msg, "That isn't a valid outfit code.");
+                return;
+            }
+        }
+        this.stakes = {
+            type,
+            code: arg,
+            proposer: player.memberNumber,
+            accepted: false,
+        };
+        this.conn.SendMessage(
+            "Emote",
+            `( ${player.name} proposes stakes: the loser ${
+                type === "outfit"
+                    ? "will be dressed in a chosen outfit"
+                    : "will be offered a BC+ contract"
+            }. The other player can use !stakes accept to agree, or propose their own. !stakes none removes. )`,
+        );
     };
 
     onFire = async (
