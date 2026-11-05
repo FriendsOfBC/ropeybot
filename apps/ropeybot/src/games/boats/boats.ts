@@ -152,7 +152,6 @@ Move onto the square of your opponent's board that you want to target, then use 
 
     private setupCharacter = async () => {
         this.conn.moveOnMap(BOT_POSITION.X, BOT_POSITION.Y);
-        this.conn.Player.SetActivePose(["Kneel"]);
     };
 
     private writePlayerName(playerIndex: number, name: string) {
