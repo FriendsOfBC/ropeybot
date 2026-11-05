@@ -674,7 +674,10 @@ Move onto the square of your opponent's board that you want to target, then use 
             type = "contract";
             try {
                 contract = parseBCPlusContract(arg);
-                if ((!contract.durationMin || contract.durationMin <= 0) && contract.policy === "author") {
+                if (
+                    (!contract.durationMin || contract.durationMin <= 0) &&
+                    contract.policy === "author"
+                ) {
                     this.conn.reply(
                         msg,
                         "BC+ contracts used as stakes must have a duration or be endable by the signer: the bot will not end them!",

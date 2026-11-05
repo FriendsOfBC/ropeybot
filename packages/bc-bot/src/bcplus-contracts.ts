@@ -83,6 +83,13 @@ export function parseBCPlusContract(offerCode: string): BCPlusContract {
 /**
  * Sends a parsed BC+ contract offer to a character in the current room.
  */
-export function offerBCPlusContract(connection: API_Connector, target: API_Character, contract: BCPlusContract): void {
-    connection.SendBCPMessage({ message: "ContractOffer", payload: contract }, target.MemberNumber);
+export function offerBCPlusContract(
+    connection: API_Connector,
+    target: API_Character,
+    contract: BCPlusContract,
+): void {
+    connection.SendBCPMessage(
+        { message: "ContractOffer", payload: contract },
+        target.MemberNumber,
+    );
 }
