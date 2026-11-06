@@ -91,6 +91,11 @@ applies to non map rooms. You can use this file as a base for things like how to
 when players enter areas on a map, adding restraints and setting their properties, sending
 and reacting to messages.
 
+### BondageBoats ('boats')
+
+A 2 player map-based game involving battles with ships that may or may not bear resemblance to
+a popular board game. Except in this version, you get tied.
+
 ### Kidnappers ('kidnappers')
 
 From the original bot hub. Code is mostly unmodified from its original state.
