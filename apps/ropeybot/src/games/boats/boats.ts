@@ -107,6 +107,7 @@ Move onto the square of your opponent's board that you want to target, then use 
     private stakes?: Stakes;
     private finished = false;
     private currentPlayer = 0;
+    private playersFirstTurnComplete = new Set<number>();
     private web: WebServer;
     private disconnectTimers = new Map<number, ReturnType<typeof setTimeout>>();
 
@@ -154,13 +155,18 @@ Move onto the square of your opponent's board that you want to target, then use 
         this.conn.moveOnMap(BOT_POSITION.X, BOT_POSITION.Y);
     };
 
-    private writePlayerName(playerIndex: number, name: string, maxLength: number) {
+    private writePlayerName(
+        playerIndex: number,
+        name: string,
+        maxLength: number,
+    ) {
         const origin = playerIndex === 0 ? GRID_ORIGIN_P1 : GRID_ORIGIN_P2;
         const maxWidth =
             playerIndex === 0
                 ? GRID_ORIGIN_P2.X - GRID_ORIGIN_P1.X
                 : 40 - GRID_ORIGIN_P2.X;
-        const truncatedName = name.length > maxLength ? name.substring(0, maxLength) : name;
+        const truncatedName =
+            name.length > maxLength ? name.substring(0, maxLength) : name;
         this.conn.chatRoom.map.writeText(
             { X: origin.X, Y: origin.Y - 1 },
             truncatedName,
@@ -246,7 +252,11 @@ Move onto the square of your opponent's board that you want to target, then use 
 
     private drawPlayerNames() {
         for (let i = 0; i < 2; i++) {
-            this.writePlayerName(i, this.players[i]?.name ?? `Player ${i + 1}`, BOARD_SIZE);
+            this.writePlayerName(
+                i,
+                this.players[i]?.name ?? `Player ${i + 1}`,
+                BOARD_SIZE,
+            );
         }
     }
 
@@ -391,11 +401,13 @@ Move onto the square of your opponent's board that you want to target, then use 
         }
         this.started = true;
         this.currentPlayer = 0;
+        this.playersFirstTurnComplete.clear();
         this.conn.SendMessage(
             "Chat",
             `(The game is starting! ${this.players[0].name}, it's your turn. ` +
                 `Move to a square on your opponent's board and use !fire to fire at it.`,
         );
+        this.playersFirstTurnComplete.add(this.players[0].memberNumber);
     }
 
     private boardOrigin(playerIndex: number) {
@@ -774,10 +786,7 @@ Move onto the square of your opponent's board that you want to target, then use 
 
         if (!boat) {
             this.conn.chatRoom.map.setObject(tilePos, "IconCross");
-            this.conn.SendMessage(
-                "Chat",
-                `(❌ miss`,
-            );
+            this.conn.SendMessage("Chat", `(❌ miss`);
         } else {
             this.conn.chatRoom.map.setObject(tilePos, "LogFire");
             const sunk = this.boatCells(boat).every((c) =>
@@ -815,9 +824,17 @@ Move onto the square of your opponent's board that you want to target, then use 
         }
 
         this.currentPlayer = targetIndex;
-        this.conn.SendMessage(
-            "Chat",
-            `(${target.name}, it's your turn. Use !fire to choose a square on your opponent's board.`,
+        const isFirstTurn = !this.playersFirstTurnComplete.has(
+            target.memberNumber,
         );
+        if (isFirstTurn) {
+            this.playersFirstTurnComplete.add(target.memberNumber);
+            this.conn.SendMessage(
+                "Chat",
+                `(${target.name}, it's your turn. Use !fire to choose a square on your opponent's board.`,
+            );
+        } else {
+            this.conn.SendMessage("Chat", `(${target.name}'s turn`);
+        }
     };
 }
