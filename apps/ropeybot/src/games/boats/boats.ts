@@ -853,7 +853,7 @@ ${helpText}
                 }
                 target.sunkBoats++;
                 this.applySinkingReward(target);
-                shotMessage = `🚢❌ ${attacker.name} has destroyed ${target.name}'s ${BOAT_NAMES[boat.length]}!`;
+                shotMessage = `🔥🚢🔥 ${attacker.name} has destroyed ${target.name}'s ${BOAT_NAMES[boat.length]}!`;
             } else {
                 shotMessage = `🔥${attacker.name}'s shot has struck a vessel!`;
             }
