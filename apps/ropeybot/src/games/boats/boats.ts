@@ -534,11 +534,13 @@ You can clear the board with !reset, or rejojn to play again.`,
         const origin = this.boardOrigin(winnerIndex);
         for (const boat of winner.placement) {
             for (const cell of this.boatCells(boat)) {
-                this.conn.chatRoom.map.setObject(
-                    { X: origin.X + cell.x, Y: origin.Y + cell.y },
-                    "Red",
-                    "Banners",
-                );
+                if (!winner.shotsReceived.has(`${cell.x},${cell.y}`)) {
+                    this.conn.chatRoom.map.setObject(
+                        { X: origin.X + cell.x, Y: origin.Y + cell.y },
+                        "Red",
+                        "Banners",
+                    );
+                }
             }
         }
     }
@@ -785,7 +787,7 @@ You can clear the board with !reset, or rejojn to play again.`,
             `( ${player.name} proposes stakes: the loser ${
                 type === "outfit"
                     ? "will be dressed in a chosen outfit"
-                    : "will be offered a BC+ contract"
+                    : "must enter into a BC+ contract"
             }. The other player can use !stakes accept to agree, or propose their own. !stakes none removes. )`,
         );
     };
@@ -843,7 +845,7 @@ You can clear the board with !reset, or rejojn to play again.`,
 
         if (!boat) {
             this.conn.chatRoom.map.setObject(tilePos, "IconCross");
-            shotMessage = `❌ miss`;
+            shotMessage = `❌ miss.`;
         } else {
             this.conn.chatRoom.map.setObject(tilePos, "LogFire");
             const sunk = this.boatCells(boat).every((c) =>
@@ -887,7 +889,7 @@ You can clear the board with !reset, or rejojn to play again.`,
         } else {
             this.conn.SendMessage(
                 "Chat",
-                `${shotMessage} (${target.name}'s turn`,
+                `(${shotMessage} ${target.name}'s turn`,
             );
         }
     };
