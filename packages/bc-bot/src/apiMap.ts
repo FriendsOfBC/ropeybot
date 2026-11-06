@@ -17,6 +17,7 @@ import { API_Character } from "./apiCharacter.ts";
 import { API_Chatroom_Data } from "./apiChatroom.ts";
 import { API_Connector } from "./apiConnector.ts";
 import { EventEmitter } from "node:events";
+import { MapTextUtil } from "./mapText.ts";
 import { AssetsMapDataObjects, AssetsMapDataTiles } from "./bcdata/MapData.js";
 
 export interface MapRegion {
@@ -24,8 +25,10 @@ export interface MapRegion {
     BottomRight: ChatRoomMapPos;
 }
 
-// https://github.com/FriendsOfBC/ropeybot/issues/4
-function mapTileByName(name: string, type?: string): ChatRoomMapTile | null {
+function mapTileByNameAndType(
+    name: string,
+    type?: ChatRoomMapTileType,
+): ChatRoomMapTile | null {
     return (
         AssetsMapDataTiles.find(
             (tile) =>
@@ -35,8 +38,17 @@ function mapTileByName(name: string, type?: string): ChatRoomMapTile | null {
     );
 }
 
-function mapObjectByName(name: string): ChatRoomMapObject | null {
-    return AssetsMapDataObjects.find((tile) => tile.Style === name) ?? null;
+function mapObjectByNameAndType(
+    name: string,
+    type?: ChatRoomMapObjectType,
+): ChatRoomMapObject | null {
+    return (
+        AssetsMapDataObjects.find(
+            (tile) =>
+                (type === undefined || tile.Type === type) &&
+                tile.Style === name,
+        ) ?? null
+    );
 }
 
 interface TileTrigger {
@@ -181,11 +193,11 @@ export class API_Map extends EventEmitter<MapEvents> {
     public setTile(
         pos: ChatRoomMapPos,
         tileName: string,
-        tileType?: string,
+        tileType?: ChatRoomMapTileType,
     ): void {
         if (!this.mapData) return;
 
-        const tile = mapTileByName(tileName, tileType);
+        const tile = mapTileByNameAndType(tileName, tileType);
         if (!tile) return;
 
         const tileNum = pos.X + pos.Y * 40;
@@ -206,10 +218,14 @@ export class API_Map extends EventEmitter<MapEvents> {
         return obj?.Style ?? null;
     }
 
-    public setObject(pos: ChatRoomMapPos, objectName: string): void {
+    public setObject(
+        pos: ChatRoomMapPos,
+        objectName: string,
+        objectType?: ChatRoomMapObjectType,
+    ): void {
         if (!this.mapData) return;
 
-        const tile = mapObjectByName(objectName);
+        const tile = mapObjectByNameAndType(objectName, objectType);
         if (!tile) return;
 
         const tileNum = pos.X + pos.Y * 40;
@@ -219,6 +235,25 @@ export class API_Map extends EventEmitter<MapEvents> {
             this.mapData.Objects?.substring(tileNum + 1);
 
         this.queueUpdate();
+    }
+
+    /**
+     * Writes text onto the map as FloorLetter / FloorNumber objects, starting
+     * at the given position and moving right. Whitespace clears the tile's
+     * object; other non-alphanumeric characters are dropped; text running off
+     * the right edge of the map is truncated. If maxWidth is provided, text is
+     * truncated to that width and the remaining tiles are cleared.
+     */
+    public writeText(
+        pos: ChatRoomMapPos,
+        text: string,
+        maxWidth?: number,
+    ): void {
+        const names = MapTextUtil.textToObjectNames(text);
+        const width = Math.min(maxWidth ?? names.length, 40 - pos.X);
+        for (let i = 0; i < width; i++) {
+            this.setObject({ X: pos.X + i, Y: pos.Y }, names[i] ?? "Passable");
+        }
     }
 
     public onCharacterMove(
