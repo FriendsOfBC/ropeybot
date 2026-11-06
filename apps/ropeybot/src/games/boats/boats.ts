@@ -514,7 +514,8 @@ ${helpText}
         this.finished = true;
         this.conn.SendMessage(
             "Chat",
-            `(${loser.name}'s entire fleet is destroyed. ${winner.name} wins!`,
+            `(🚢🚢🚢🚢🚢🚢 ${loser.name}'s entire fleet is destroyed. ${winner.name} wins!
+            You can clean the board with !reset, or rejojn to play again.`,
         );
         this.revealWinnerBoats(winner);
         this.removeSinkingRewards(winner);
