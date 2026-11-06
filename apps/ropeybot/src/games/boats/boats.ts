@@ -23,7 +23,7 @@ import { decompressFromBase64 } from "lz-string";
 import { wait } from "../../hub/utils";
 
 const DISCONNECT_TIMEOUT_MS = 2 * 60 * 1000;
-const BOT_POSITION = { X: 0, Y: 39 };
+const BOT_POSITION = { X: 39, Y: 0 };
 const GRID_ORIGIN_P1 = { X: 4, Y: 25 };
 const GRID_ORIGIN_P2 = { X: 15, Y: 25 };
 
@@ -154,15 +154,16 @@ Move onto the square of your opponent's board that you want to target, then use 
         this.conn.moveOnMap(BOT_POSITION.X, BOT_POSITION.Y);
     };
 
-    private writePlayerName(playerIndex: number, name: string) {
+    private writePlayerName(playerIndex: number, name: string, maxLength: number) {
         const origin = playerIndex === 0 ? GRID_ORIGIN_P1 : GRID_ORIGIN_P2;
         const maxWidth =
             playerIndex === 0
                 ? GRID_ORIGIN_P2.X - GRID_ORIGIN_P1.X
                 : 40 - GRID_ORIGIN_P2.X;
+        const truncatedName = name.length > maxLength ? name.substring(0, maxLength) : name;
         this.conn.chatRoom.map.writeText(
             { X: origin.X, Y: origin.Y - 1 },
-            name,
+            truncatedName,
             maxWidth,
         );
     }
@@ -245,7 +246,7 @@ Move onto the square of your opponent's board that you want to target, then use 
 
     private drawPlayerNames() {
         for (let i = 0; i < 2; i++) {
-            this.writePlayerName(i, this.players[i]?.name ?? `Player ${i + 1}`);
+            this.writePlayerName(i, this.players[i]?.name ?? `Player ${i + 1}`, BOARD_SIZE);
         }
     }
 
@@ -254,11 +255,11 @@ Move onto the square of your opponent's board that you want to target, then use 
             for (let x = 0; x < 10; x++) {
                 this.conn.chatRoom.map.setObject(
                     { X: GRID_ORIGIN_P1.X + x, Y: GRID_ORIGIN_P1.Y + y },
-                    "IconEmpty",
+                    "Blank",
                 );
                 this.conn.chatRoom.map.setObject(
                     { X: GRID_ORIGIN_P2.X + x, Y: GRID_ORIGIN_P2.Y + y },
-                    "IconEmpty",
+                    "Blank",
                 );
             }
         }
@@ -422,15 +423,17 @@ Move onto the square of your opponent's board that you want to target, then use 
 
         switch (player.sunkBoats) {
             case 1:
-                character.Appearance.AddItem(
+                const mittens = character.Appearance.AddItem(
                     AssetGet("ItemHands", "LatexBondageMitts"),
                 );
+                mittens.SetDifficulty(20);
                 break;
             case 2: {
                 const rope = character.Appearance.AddItem(
                     AssetGet("ItemArms", "HempRope"),
                 );
                 rope.Extended?.SetType("BoxTie");
+                rope.SetDifficulty(20);
                 break;
             }
             case 3:
@@ -448,6 +451,7 @@ Move onto the square of your opponent's board that you want to target, then use 
                     AssetGet("ItemArms", "HempRope"),
                 );
                 rope.Extended?.SetType("Hogtied");
+                rope.SetDifficulty(20);
                 character.Appearance.AddItem(
                     AssetGet("ItemMouth", "ClothStuffing"),
                 );
@@ -765,14 +769,14 @@ Move onto the square of your opponent's board that you want to target, then use 
             this.boatCells(b).some((c) => c.x === square.x && c.y === square.y),
         );
 
-        this.conn.SendMessage("Chat", `(${attacker.name} fires a salvo!`);
-        await wait(2000);
+        //this.conn.SendMessage("Chat", `(${attacker.name} fires a salvo!`);
+        await wait(1000);
 
         if (!boat) {
             this.conn.chatRoom.map.setObject(tilePos, "IconCross");
             this.conn.SendMessage(
                 "Chat",
-                `(Plop! ${attacker.name}'s shot misses.`,
+                `(❌ miss`,
             );
         } else {
             this.conn.chatRoom.map.setObject(tilePos, "LogFire");
@@ -790,12 +794,12 @@ Move onto the square of your opponent's board that you want to target, then use 
                 this.applySinkingReward(target);
                 this.conn.SendMessage(
                     "Chat",
-                    `(${attacker.name} has destroyed ${target.name}'s ${BOAT_NAMES[boat.length]}!`,
+                    `(🚢❌ ${attacker.name} has destroyed ${target.name}'s ${BOAT_NAMES[boat.length]}!`,
                 );
             } else {
                 this.conn.SendMessage(
                     "Chat",
-                    `(${attacker.name}'s shot has struck a vessel!`,
+                    `(🔥${attacker.name}'s shot has struck a vessel!`,
                 );
             }
             if (
