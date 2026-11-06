@@ -516,8 +516,26 @@ ${helpText}
             "Chat",
             `(${loser.name}'s entire fleet is destroyed. ${winner.name} wins!`,
         );
+        this.revealWinnerBoats(winner);
         this.removeSinkingRewards(winner);
         this.applyStakes(loser);
+    }
+
+    private revealWinnerBoats(winner: BoatsPlayer): void {
+        const winnerIndex = this.players.indexOf(winner);
+        if (winnerIndex === -1 || !winner.placement) {
+            return;
+        }
+        const origin = this.boardOrigin(winnerIndex);
+        for (const boat of winner.placement) {
+            for (const cell of this.boatCells(boat)) {
+                this.conn.chatRoom.map.setObject(
+                    { X: origin.X + cell.x, Y: origin.Y + cell.y },
+                    "Red",
+                    "Banners",
+                );
+            }
+        }
     }
 
     private applyStakes(loser: BoatsPlayer): void {

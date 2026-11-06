@@ -25,8 +25,10 @@ export interface MapRegion {
     BottomRight: ChatRoomMapPos;
 }
 
-// https://github.com/FriendsOfBC/ropeybot/issues/4
-function mapTileByName(name: string, type?: string): ChatRoomMapTile | null {
+function mapTileByNameAndType(
+    name: string,
+    type?: ChatRoomMapTileType,
+): ChatRoomMapTile | null {
     return (
         AssetsMapDataTiles.find(
             (tile) =>
@@ -36,8 +38,17 @@ function mapTileByName(name: string, type?: string): ChatRoomMapTile | null {
     );
 }
 
-function mapObjectByName(name: string): ChatRoomMapObject | null {
-    return AssetsMapDataObjects.find((tile) => tile.Style === name) ?? null;
+function mapObjectByNameAndType(
+    name: string,
+    type?: ChatRoomMapObjectType,
+): ChatRoomMapObject | null {
+    return (
+        AssetsMapDataObjects.find(
+            (tile) =>
+                (type === undefined || tile.Type === type) &&
+                tile.Style === name,
+        ) ?? null
+    );
 }
 
 interface TileTrigger {
@@ -182,11 +193,11 @@ export class API_Map extends EventEmitter<MapEvents> {
     public setTile(
         pos: ChatRoomMapPos,
         tileName: string,
-        tileType?: string,
+        tileType?: ChatRoomMapTileType,
     ): void {
         if (!this.mapData) return;
 
-        const tile = mapTileByName(tileName, tileType);
+        const tile = mapTileByNameAndType(tileName, tileType);
         if (!tile) return;
 
         const tileNum = pos.X + pos.Y * 40;
@@ -207,10 +218,14 @@ export class API_Map extends EventEmitter<MapEvents> {
         return obj?.Style ?? null;
     }
 
-    public setObject(pos: ChatRoomMapPos, objectName: string): void {
+    public setObject(
+        pos: ChatRoomMapPos,
+        objectName: string,
+        objectType?: ChatRoomMapObjectType,
+    ): void {
         if (!this.mapData) return;
 
-        const tile = mapObjectByName(objectName);
+        const tile = mapObjectByNameAndType(objectName, objectType);
         if (!tile) return;
 
         const tileNum = pos.X + pos.Y * 40;
