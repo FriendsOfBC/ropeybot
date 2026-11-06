@@ -838,7 +838,7 @@ ${helpText}
 
         if (!boat) {
             this.conn.chatRoom.map.setObject(tilePos, "IconCross");
-            shotMessage = `(❌ miss`;
+            shotMessage = `❌ miss`;
         } else {
             this.conn.chatRoom.map.setObject(tilePos, "LogFire");
             const sunk = this.boatCells(boat).every((c) =>
@@ -853,9 +853,9 @@ ${helpText}
                 }
                 target.sunkBoats++;
                 this.applySinkingReward(target);
-                shotMessage = `(🚢❌ ${attacker.name} has destroyed ${target.name}'s ${BOAT_NAMES[boat.length]}!`;
+                shotMessage = `🚢❌ ${attacker.name} has destroyed ${target.name}'s ${BOAT_NAMES[boat.length]}!`;
             } else {
-                shotMessage = `(🔥${attacker.name}'s shot has struck a vessel!`;
+                shotMessage = `🔥${attacker.name}'s shot has struck a vessel!`;
             }
             if (
                 target.placement!.every((b) =>
