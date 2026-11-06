@@ -273,11 +273,15 @@ ${helpText}
             for (let x = 0; x < 10; x++) {
                 this.conn.chatRoom.map.setObject(
                     { X: GRID_ORIGIN_P1.X + x, Y: GRID_ORIGIN_P1.Y + y },
-                    "Blank",
+                    "Passable",
+                    // @ts-ignore - defs are from 134 but bc-stubs 134 is not out yet so it thinks the types are incorrect
+                    "EmptySpace",
                 );
                 this.conn.chatRoom.map.setObject(
                     { X: GRID_ORIGIN_P2.X + x, Y: GRID_ORIGIN_P2.Y + y },
-                    "Blank",
+                    "Passable",
+                    // @ts-ignore - defs are from 134 but bc-stubs 134 is not out yet so it thinks the types are incorrect
+                    "EmptySpace",
                 );
             }
         }
@@ -514,8 +518,8 @@ ${helpText}
         this.finished = true;
         this.conn.SendMessage(
             "Chat",
-            `(🚢🚢🚢🚢🚢🚢 ${loser.name}'s entire fleet is destroyed. ${winner.name} wins!
-            You can clean the board with !reset, or rejojn to play again.`,
+            `(🚢🚢🚢🚢🚢🚢 ${loser.name}'s entire fleet is destroyed: ${winner.name} wins!
+You can clear the board with !reset, or rejojn to play again.`,
         );
         this.revealWinnerBoats(winner);
         this.removeSinkingRewards(winner);
