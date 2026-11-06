@@ -73,13 +73,7 @@ interface Stakes {
 const MAP =
     "N4IgKgngDgpiBcICCAbA7gQwgZxAGnAEsUZdEATSq6m2u+hxp5l1t9jzr7n3v/gYKHCRoseImSp0mbLnzugJpBlK1WvUbFTRQCq9+g4aNGtjXcYuW9phuav2DN+ncAsQG/cedAYJ++/+pzpXDxDvP3CA7X0Q0PCI6yi9GM84/wSzaOS3MNSvSIykrJcc1PzbTKySuLLnCuSq+J1A2mDK3J8aoLqYhrSmxIdB5po7Qfth6lGxywmqKenjWcp5hcMl8nwQAHkAIwArGABjABcyEAULy6vrm9u7+4fHp+eX17f3j8+v75/fv/+AYCgXcAHYCTYAYRgKBQABEMMcMAhgABfFFAA=@EAApAIABfwb/e/9//284fg==";
 
-export class Boats {
-    public static description = `Boats
- =====
-
-BOATS, BOATS, BOATS!
-
-Yarr, me hearties! This be a game of naval strategy upon the high seas! Sink the
+const helpText = `Yarr, me hearties! This be a game of naval strategy upon the high seas! Sink the
 other cap'n's fleet afore they sink yers, else ye be tied to the mast!
 Resemblance to any other grid-based naval strategy game be purely coincidental, ye scurvy land lubber.
 
@@ -99,6 +93,18 @@ Starts the game once both players have placed their boats.
 
 !fire
 Move onto the square of your opponent's board that you want to target, then use !fire to fire at it.
+
+!reset
+Ends the current game and clears the board.
+`;
+
+export class Boats {
+    public static description = `Boats
+ =====
+
+BOATS, BOATS, BOATS!
+
+${helpText}
 `;
 
     private commandParser: CommandParser;
@@ -126,6 +132,8 @@ Move onto the square of your opponent's board that you want to target, then use 
         this.commandParser.register("win", this.onWin);
         this.commandParser.register("start", this.onStart);
         this.commandParser.register("stakes", this.onStakes);
+        this.commandParser.register("reset", this.onReset);
+        this.commandParser.register("help", this.onHelp);
         /*
         this.commandParser.register("testcontract", (sender, args) => {
             offerBCPlusContract(this.conn, sender, "BCP1:contract:N4IgLglmA2CmIC5ywM5hAGmQJwLYsRExABMBXbAQ0gHsA7AWQjsQAYsAHG6CAYwE9CsKAAtY2YtjJwCCUFFj4AdADNssYXQDmAeTBjss0JV6QAbvARgpsLLDoqa2XpetlbIaDS2I3HynR0NGR0Lr42WGQosADiXgBGlNDh7ljRYJDaRiBJXgDuAKKUKIIIKknRAL7VWJRk+k6IAIxNABxNAJwdtfUiTgBylLiWIAXQPPCVQA");
@@ -582,6 +590,30 @@ Move onto the square of your opponent's board that you want to target, then use 
             this.applySinkingReward(loser);
         }
         this.endGame(winner, loser);
+    };
+
+    onReset = async (
+        sender: API_Character,
+        msg: BC_Server_ChatRoomMessage,
+        args: string[],
+    ) => {
+        if (!this.started) {
+            this.conn.reply(msg, "The game hasn't started yet.");
+            return;
+        }
+        this.conn.SendMessage(
+            "Emote",
+            `( ${sender.toString()} has reset the game. )`,
+        );
+        this.resetGame();
+    };
+
+    onHelp = async (
+        sender: API_Character,
+        msg: BC_Server_ChatRoomMessage,
+        args: string[],
+    ) => {
+        sender.Tell("Whisper", "(" + helpText);
     };
 
     onStart = async (
