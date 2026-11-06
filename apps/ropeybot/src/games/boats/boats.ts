@@ -784,9 +784,11 @@ Move onto the square of your opponent's board that you want to target, then use 
         //this.conn.SendMessage("Chat", `(${attacker.name} fires a salvo!`);
         await wait(1000);
 
+        let shotMessage: string;
+
         if (!boat) {
             this.conn.chatRoom.map.setObject(tilePos, "IconCross");
-            this.conn.SendMessage("Chat", `(❌ miss`);
+            shotMessage = `(❌ miss`;
         } else {
             this.conn.chatRoom.map.setObject(tilePos, "LogFire");
             const sunk = this.boatCells(boat).every((c) =>
@@ -801,15 +803,9 @@ Move onto the square of your opponent's board that you want to target, then use 
                 }
                 target.sunkBoats++;
                 this.applySinkingReward(target);
-                this.conn.SendMessage(
-                    "Chat",
-                    `(🚢❌ ${attacker.name} has destroyed ${target.name}'s ${BOAT_NAMES[boat.length]}!`,
-                );
+                shotMessage = `(🚢❌ ${attacker.name} has destroyed ${target.name}'s ${BOAT_NAMES[boat.length]}!`;
             } else {
-                this.conn.SendMessage(
-                    "Chat",
-                    `(🔥${attacker.name}'s shot has struck a vessel!`,
-                );
+                shotMessage = `(🔥${attacker.name}'s shot has struck a vessel!`;
             }
             if (
                 target.placement!.every((b) =>
@@ -831,10 +827,13 @@ Move onto the square of your opponent's board that you want to target, then use 
             this.playersFirstTurnComplete.add(target.memberNumber);
             this.conn.SendMessage(
                 "Chat",
-                `(${target.name}, it's your turn. Use !fire to choose a square on your opponent's board.`,
+                `(${shotMessage} ${target.name}, it's now your turn. Use !fire to choose a square on your opponent's board.`,
             );
         } else {
-            this.conn.SendMessage("Chat", `(${target.name}'s turn`);
+            this.conn.SendMessage(
+                "Chat",
+                `${shotMessage} (${target.name}'s turn`,
+            );
         }
     };
 }
