@@ -21,8 +21,10 @@ import {
 } from "./placementPage";
 import { decompressFromBase64 } from "lz-string";
 import { wait } from "../../hub/utils";
+import lzString from "lz-string";
 
 const DISCONNECT_TIMEOUT_MS = 2 * 60 * 1000;
+const DISCONNECT_WARNING_1_MS = 1 * 60 * 1000;
 const BOT_POSITION = { X: 39, Y: 0 };
 const GRID_ORIGIN_P1 = { X: 4, Y: 25 };
 const GRID_ORIGIN_P2 = { X: 15, Y: 25 };
@@ -39,7 +41,7 @@ const PLAYER_TITLES = [
     "Fearless Buccaneer",
     "Daring Corsair",
     "Privateer",
-    "Admiral",
+    "Rear Admiral",
 ];
 
 const BOAT_NAMES: Record<number, string> = {
@@ -58,6 +60,7 @@ interface BoatsPlayer {
     // Shots this player's board has received, as "x,y"
     shotsReceived: Set<string>;
     sunkBoats: number;
+    disconnectedAt?: number; // Timestamp when player disconnected
 }
 
 const CONTRACT_PREFIX = "BCP1:contract:";
@@ -89,10 +92,13 @@ The other player must use !stakes accept before the game can start.
 Use the command again to change the stakes, or !stakes none to cancel them.
 
 !start
-Starts the game once both players have placed their boats.
+Starts the game once both players have placed their boats. Either player or a room admin can start it.
 
 !fire
 Move onto the square of your opponent's board that you want to target, then use !fire to fire at it.
+
+!status
+Shows the current status of the game.
 
 !reset
 Ends the current game and clears the board.
@@ -116,6 +122,10 @@ ${helpText}
     private playersFirstTurnComplete = new Set<number>();
     private web: WebServer;
     private disconnectTimers = new Map<number, ReturnType<typeof setTimeout>>();
+    private disconnectWarningTimers = new Map<
+        number,
+        ReturnType<typeof setTimeout>
+    >();
 
     public constructor(
         private conn: API_Connector,
@@ -134,6 +144,7 @@ ${helpText}
         this.commandParser.register("stakes", this.onStakes);
         this.commandParser.register("reset", this.onReset);
         this.commandParser.register("help", this.onHelp);
+        this.commandParser.register("status", this.onStatus);
         /*
         this.commandParser.register("testcontract", (sender, args) => {
             offerBCPlusContract(this.conn, sender, "BCP1:contract:N4IgLglmA2CmIC5ywM5hAGmQJwLYsRExABMBXbAQ0gHsA7AWQjsQAYsAHG6CAYwE9CsKAAtY2YtjJwCCUFFj4AdADNssYXQDmAeTBjss0JV6QAbvARgpsLLDoqa2XpetlbIaDS2I3HynR0NGR0Lr42WGQosADiXgBGlNDh7ljRYJDaRiBJXgDuAKKUKIIIKknRAL7VWJRk+k6IAIxNABxNAJwdtfUiTgBylLiWIAXQPPCVQA");
@@ -188,6 +199,23 @@ ${helpText}
             clearTimeout(timer);
             this.disconnectTimers.delete(character.MemberNumber);
         }
+        const warningTimer = this.disconnectWarningTimers.get(
+            character.MemberNumber,
+        );
+        if (warningTimer) {
+            clearTimeout(warningTimer);
+            this.disconnectWarningTimers.delete(character.MemberNumber);
+        }
+        const player = this.players.find(
+            (p) => p.memberNumber === character.MemberNumber,
+        );
+        if (player) {
+            player.disconnectedAt = undefined;
+            this.conn.SendMessage(
+                "Emote",
+                `( ${player.name} has reconnected to the game. )`,
+            );
+        }
         if (character.IsBot()) {
             return;
         }
@@ -205,14 +233,33 @@ ${helpText}
         leaveMessage: string | null,
         intentional: boolean,
     ) => {
-        if (!this.players.some((p) => p.memberNumber === memberNumber)) {
+        const player = this.players.find(
+            (p) => p.memberNumber === memberNumber,
+        );
+        if (!player) {
             return;
         }
         if (intentional) {
             this.removePlayer(memberNumber, "left the room");
             return;
         }
+        player.disconnectedAt = Date.now();
+        this.conn.SendMessage(
+            "Emote",
+            `( ${player.name} has disconnected. They will be removed from the game if they don't rejoin within 2 minutes. )`,
+        );
         clearTimeout(this.disconnectTimers.get(memberNumber));
+        clearTimeout(this.disconnectWarningTimers.get(memberNumber));
+        this.disconnectWarningTimers.set(
+            memberNumber,
+            setTimeout(() => {
+                this.disconnectWarningTimers.delete(memberNumber);
+                this.conn.SendMessage(
+                    "Emote",
+                    `( ${player.name} still hasn't reconnected. They will be removed in 1 minute. )`,
+                );
+            }, DISCONNECT_WARNING_1_MS),
+        );
         this.disconnectTimers.set(
             memberNumber,
             setTimeout(() => {
@@ -249,6 +296,8 @@ ${helpText}
     private resetGame() {
         this.disconnectTimers.forEach((t) => clearTimeout(t));
         this.disconnectTimers.clear();
+        this.disconnectWarningTimers.forEach((t) => clearTimeout(t));
+        this.disconnectWarningTimers.clear();
         this.players = [];
         this.started = false;
         this.finished = false;
@@ -571,7 +620,7 @@ You can clear the board with !reset, or rejojn to play again.`,
                     `( ${loser.name}, prepare to receive your agreed outfit. )`,
                 );
                 character.Appearance.slowlyApplyBundle(
-                    importBundle(stakes.code),
+                    JSON.parse(lzString.decompressFromBase64(stakes.code)),
                 );
             } else {
                 offerBCPlusContract(this.conn, character, stakes.contract!);
@@ -641,6 +690,96 @@ You can clear the board with !reset, or rejojn to play again.`,
         sender.Tell("Whisper", "(" + helpText);
     };
 
+    onStatus = async (
+        sender: API_Character,
+        msg: BC_Server_ChatRoomMessage,
+        args: string[],
+    ) => {
+        let status = "(Game Status: ";
+
+        if (this.players.length === 0) {
+            status += "No players joined yet. Use !join to join!";
+        } else if (this.players.length === 1) {
+            const player = this.players[0];
+            const disconnected = this.disconnectTimers.has(player.memberNumber);
+
+            if (disconnected) {
+                const disconnectTimer = this.disconnectTimers.get(
+                    player.memberNumber,
+                );
+                const warningTimer = this.disconnectWarningTimers.get(
+                    player.memberNumber,
+                );
+                let timeLeft = "unknown";
+
+                if (player.disconnectedAt) {
+                    const elapsed = Date.now() - player.disconnectedAt;
+                    const remaining = Math.max(
+                        0,
+                        DISCONNECT_TIMEOUT_MS - elapsed,
+                    );
+                    timeLeft = `${Math.ceil(remaining / 1000)} seconds`;
+                }
+
+                status += `Waiting for second player. ${player.name} is disconnected and will be removed in ${timeLeft}. Use !join to join!`;
+            } else {
+                status += `Waiting for second player (${player.name} joined). Use !join to join!`;
+            }
+        } else if (this.players.length === 2) {
+            const [player1, player2] = this.players;
+            const p1Disconnected = this.disconnectTimers.has(
+                player1.memberNumber,
+            );
+            const p2Disconnected = this.disconnectTimers.has(
+                player2.memberNumber,
+            );
+
+            if (!this.started) {
+                const p1Ready = player1.placement ? "ready" : "not ready";
+                const p2Ready = player2.placement ? "ready" : "not ready";
+                status += `Waiting to start. ${player1.name} is ${p1Ready}, ${player2.name} is ${p2Ready}.`;
+
+                if (p1Disconnected || p2Disconnected) {
+                    const disconnectedPlayer = p1Disconnected
+                        ? player1
+                        : player2;
+                    if (disconnectedPlayer.disconnectedAt) {
+                        const elapsed =
+                            Date.now() - disconnectedPlayer.disconnectedAt;
+                        const remaining = Math.max(
+                            0,
+                            DISCONNECT_TIMEOUT_MS - elapsed,
+                        );
+                        status += ` ${disconnectedPlayer.name} is disconnected and will be removed in ${Math.ceil(remaining / 1000)} seconds.`;
+                    }
+                }
+            } else if (this.finished) {
+                status += `Game has finished.`;
+            } else {
+                const currentPlayer = this.players[this.currentPlayer];
+                status += `Game in progress. ${currentPlayer.name}'s turn.`;
+
+                if (p1Disconnected || p2Disconnected) {
+                    const disconnectedPlayer = p1Disconnected
+                        ? player1
+                        : player2;
+                    if (disconnectedPlayer.disconnectedAt) {
+                        const elapsed =
+                            Date.now() - disconnectedPlayer.disconnectedAt;
+                        const remaining = Math.max(
+                            0,
+                            DISCONNECT_TIMEOUT_MS - elapsed,
+                        );
+                        status += ` ${disconnectedPlayer.name} is disconnected and will be removed in ${Math.ceil(remaining / 1000)} seconds.`;
+                    }
+                }
+            }
+        }
+
+        status += ")";
+        this.conn.SendMessage("Chat", status);
+    };
+
     onStart = async (
         sender: API_Character,
         msg: BC_Server_ChatRoomMessage,
@@ -649,7 +788,7 @@ You can clear the board with !reset, or rejojn to play again.`,
         const player = this.players.find(
             (p) => p.memberNumber === sender.MemberNumber,
         );
-        if (!player) {
+        if (!player && !sender.IsRoomAdmin()) {
             this.conn.reply(msg, "You're not in this game.");
             return;
         }
@@ -702,7 +841,9 @@ You can clear the board with !reset, or rejojn to play again.`,
             );
             return;
         }
-        const keyword = arg.toLowerCase();
+        const keyword = arg;
+
+        const origArg = msg.Content.split(" ")[1]; // the arg before it got lowercased, which is important for base64
 
         if (keyword === "none") {
             if (!this.stakes) {
@@ -767,17 +908,22 @@ You can clear the board with !reset, or rejojn to play again.`,
         } else {
             type = "outfit";
             try {
-                if (!Array.isArray(importBundle(arg))) {
+                const outfit = JSON.parse(lzString.decompressFromBase64(origArg));
+                console.log(origArg + " -> Decompressed outfit:", lzString.decompressFromBase64(origArg));
+                if (
+                    !Array.isArray(outfit)
+                ) {
                     throw new TypeError("Not an outfit");
                 }
-            } catch {
+            } catch (e) {
+                console.log("Error parsing outfit code:", e);
                 this.conn.reply(msg, "That isn't a valid outfit code.");
                 return;
             }
         }
         this.stakes = {
             type,
-            code: arg,
+            code: origArg,
             contract,
             proposer: player.memberNumber,
             accepted: false,
