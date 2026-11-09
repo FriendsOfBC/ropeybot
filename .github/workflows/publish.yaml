@@ -23,4 +23,4 @@ jobs:
 
             - name: Build & Publish
               working-directory: packages/bc-/bot
-            - run: "pnpm publish --provenance --access public --no-git-checks"
+              run: "pnpm publish --provenance --access public --no-git-checks"
