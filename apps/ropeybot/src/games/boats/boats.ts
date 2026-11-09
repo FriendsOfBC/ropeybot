@@ -908,11 +908,10 @@ You can clear the board with !reset, or rejojn to play again.`,
         } else {
             type = "outfit";
             try {
-                const outfit = JSON.parse(lzString.decompressFromBase64(origArg));
-                console.log(origArg + " -> Decompressed outfit:", lzString.decompressFromBase64(origArg));
-                if (
-                    !Array.isArray(outfit)
-                ) {
+                const outfit = JSON.parse(
+                    lzString.decompressFromBase64(origArg),
+                );
+                if (!Array.isArray(outfit)) {
                     throw new TypeError("Not an outfit");
                 }
             } catch (e) {
