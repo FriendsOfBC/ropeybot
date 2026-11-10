@@ -415,6 +415,12 @@ ${helpText}
                 "Emote",
                 `( ${PLAYER_TITLES[Math.floor(Math.random() * PLAYER_TITLES.length)]} ${sender} has joined the game.`,
             );
+        } else {
+            this.conn.reply(
+                msg,
+                "You are already joined to this game!",
+            );
+            return;
         }
         if (args[0]?.toLowerCase() === "random") {
             if (player.placement) {
