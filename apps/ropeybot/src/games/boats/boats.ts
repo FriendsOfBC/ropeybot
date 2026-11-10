@@ -890,10 +890,10 @@ You can clear the board with !reset, or rejojn to play again.`,
 
         let type: Stakes["type"];
         let contract: BCPlusContract | undefined;
-        if (arg.startsWith(CONTRACT_PREFIX)) {
+        if (origArg.startsWith(CONTRACT_PREFIX)) {
             type = "contract";
             try {
-                contract = parseBCPlusContract(arg);
+                contract = parseBCPlusContract(origArg);
                 if (
                     (!contract.durationMin || contract.durationMin <= 0) &&
                     contract.policy === "author"
