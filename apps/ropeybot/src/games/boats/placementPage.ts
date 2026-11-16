@@ -1,7 +1,7 @@
 import { escapeHtml } from "../../webserver";
 
 export const BOARD_SIZE = 10;
-export const BOAT_LENGTHS = [1, 2, 3, 4, 5];
+export const BOAT_LENGTHS = [2, 3, 3, 4, 5];
 
 export interface BoatPlacement {
     length: number;

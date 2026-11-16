@@ -45,7 +45,6 @@ const PLAYER_TITLES = [
 ];
 
 const BOAT_NAMES: Record<number, string> = {
-    1: "Dinghy",
     2: "Pirate Ship",
     3: "Subbiemarine",
     4: "Kinky Cruise Ship",
