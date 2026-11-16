@@ -540,7 +540,7 @@ ${helpText}
         }
     }
 
-    private removeSinkingRewards(player: BoatsPlayer): void {
+    private async removeSinkingRewards(player: BoatsPlayer): Promise<void> {
         const character = this.conn.chatRoom.characters.find(
             (c) => c.MemberNumber === player.memberNumber,
         );
@@ -562,11 +562,12 @@ ${helpText}
                 character.Appearance.InventoryGet(group)?.Name === itemName
             ) {
                 character.Appearance.RemoveItem(group);
+                await wait(200);
             }
         }
     }
 
-    private endGame(winner: BoatsPlayer, loser: BoatsPlayer): void {
+    private async endGame(winner: BoatsPlayer, loser: BoatsPlayer): Promise<void> {
         this.finished = true;
         this.conn.SendMessage(
             "Chat",
@@ -574,7 +575,7 @@ ${helpText}
 You can clear the board with !reset, or rejojn to play again.`,
         );
         this.revealWinnerBoats(winner);
-        this.removeSinkingRewards(winner);
+        await this.removeSinkingRewards(winner);
         this.applyStakes(loser);
     }
 
@@ -666,7 +667,7 @@ You can clear the board with !reset, or rejojn to play again.`,
             loser.sunkBoats++;
             this.applySinkingReward(loser);
         }
-        this.endGame(winner, loser);
+        await this.endGame(winner, loser);
     };
 
     onReset = async (
@@ -1019,7 +1020,7 @@ You can clear the board with !reset, or rejojn to play again.`,
                     ),
                 )
             ) {
-                this.endGame(attacker, target);
+                await this.endGame(attacker, target);
                 return;
             }
         }
