@@ -566,7 +566,10 @@ ${helpText}
         }
     }
 
-    private async endGame(winner: BoatsPlayer, loser: BoatsPlayer): Promise<void> {
+    private async endGame(
+        winner: BoatsPlayer,
+        loser: BoatsPlayer,
+    ): Promise<void> {
         this.finished = true;
         this.conn.SendMessage(
             "Chat",
