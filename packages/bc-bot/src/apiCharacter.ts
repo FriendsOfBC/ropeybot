@@ -433,14 +433,14 @@ export class API_Character {
         this.connection.updateCharacterItem({
             Target: this.MemberNumber,
             Group: data.Group,
-            Name: item != null ? item.Name : undefined,
-            Color: item != null && item.Color != null ? item.Color : "Default",
+            Name: item ? item.Name : null,
+            Color: item?.Color != null ? item.Color : "Default",
             Difficulty: data.Difficulty ?? 0,
             Property:
-                item != null && item.Property != null
+                item?.Property
                     ? item.Property
                     : undefined,
-            Craft: item != null && item.Craft != null ? item.Craft : undefined,
+            Craft: item?.Craft ? item.Craft : undefined,
         });
     }
 
