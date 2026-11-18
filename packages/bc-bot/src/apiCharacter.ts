@@ -436,10 +436,7 @@ export class API_Character {
             Name: item ? item.Name : null,
             Color: item?.Color != null ? item.Color : "Default",
             Difficulty: data.Difficulty ?? 0,
-            Property:
-                item?.Property
-                    ? item.Property
-                    : undefined,
+            Property: item?.Property ? item.Property : undefined,
             Craft: item?.Craft ? item.Craft : undefined,
         });
     }
