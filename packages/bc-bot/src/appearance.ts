@@ -113,6 +113,7 @@ export class AssetType {
 	}*/
 
     public countColorableLayers(): number {
+        if (!this.def) return 0;
         return this.def.Layer ? this.def.Layer.length : 1;
     }
 }

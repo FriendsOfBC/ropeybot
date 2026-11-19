@@ -139,17 +139,14 @@ export class API_Chatroom extends EventEmitter<ChatRoomEvents> {
         return this.data.Character.length;
     }
 
+    // @deprecated Use API_Map.mapType
     public usesMaps(): boolean {
-        if (this.data.MapData === undefined) return false;
-        return this.data.MapData.Type !== "Never";
+        return this.map.mapType() !== "Never";
     }
 
+    // @deprecated Use API_Map.setMapType
     public useMap(useMap: boolean) {
-        const data: ServerChatRoomMapData = {
-            Type: useMap ? "Always" : "Never",
-        };
-        Object.assign(this.data, data);
-        this.conn.ChatRoomUpdate({ MapData: this.data.MapData });
+        this.map.setMapType(useMap ? "Always" : "Never");
     }
 
     public saveChanges(): void {
