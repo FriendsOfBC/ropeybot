@@ -79,12 +79,17 @@ Starts a new game. Difficulty can be easy, medium, or hard.
 
 !flag
 Flags or unflags the square you are standing on.
+Aliases: !f and f
 
 !sweep
 Reveals the square you are standing on when it does not contain a mine.
+Aliases: !s and s
 
 !reset
 Clears the board.
+
+!free
+Frees a loser's arms.
 
 !leaderboard <difficulty>
 Displays today's and the all-time leaderboard for easy, medium, or hard.
@@ -128,8 +133,11 @@ ${helpText}
         this.commandParser = new CommandParser(conn);
         this.commandParser.register("start", this.onStart);
         this.commandParser.register("flag", this.onFlag);
+        this.commandParser.register("f", this.onFlag, true);
         this.commandParser.register("sweep", this.onSweep);
+        this.commandParser.register("s", this.onSweep, true);
         this.commandParser.register("reset", this.onReset);
+        this.commandParser.register("free", this.onFree);
         this.commandParser.register("cheat", this.onCheat);
         this.commandParser.register("win", this.onWin);
         this.commandParser.register("open", this.onOpen);
@@ -221,11 +229,14 @@ ${helpText}
     private setupRoom = async () => {
         this.conn.chatRoom.useMap(true);
         this.generateMap();
+        await wait(200);
         this.conn.moveOnMap(BOT_POSITION.X, BOT_POSITION.Y);
         await this.updateRoomDescription();
     };
 
     private generateMap(): void {
+        this.conn.chatRoom.map.clearObjects();
+
         // Create 30x20 area enclosed by walls
         // Walls around the grid
         for (
@@ -303,11 +314,13 @@ ${helpText}
         this.gameStartedAt = Date.now();
         this.gameEnded = false;
         this.writeMineCount();
-        await this.updateRoomDescription();
         this.conn.SendMessage(
             "Emote",
-            `(The board is set, ${sender.toString()}. Be careful: set off a mine and you'll be stuck.`,
+            `(The board is set, ${sender.toString()}. Use !sweep to reveal a square and !flag to mark a mine ('s' and 'f' also work). Be careful: set off a mine and you'll be stuck.`,
         );
+
+        await wait(1000);
+        await this.updateRoomDescription();
     };
 
     onFlag = async (
@@ -409,6 +422,24 @@ ${helpText}
         }
         await this.setupRoom();
         this.conn.SendMessage("Emote", "(The game has been reset.");
+    };
+
+    onFree = async (
+        sender: API_Character,
+        msg: BC_Server_ChatRoomMessage,
+        args: string[],
+    ) => {
+        if (!this.positionIsInArea(sender.MapPos, LOSERS_AREA)) {
+            this.conn.reply(msg, "Only losers can use !free.");
+            return;
+        }
+        if (!sender.Appearance.InventoryGet("ItemArms")) {
+            this.conn.reply(msg, "Your arms are already free.");
+            return;
+        }
+
+        sender.Appearance.RemoveItem("ItemArms");
+        this.conn.reply(msg, "Your arms have been freed.");
     };
 
     onOpen = async (
@@ -850,6 +881,7 @@ ${helpText}
         const slime =
             SLIME_FLOORS[Math.floor(Math.random() * SLIME_FLOORS.length)];
         const affectedTiles = this.drawExplosion(position, slime.tile);
+        this.drawLosersArea();
         const affectedPlayers = this.conn.chatRoom.characters.filter(
             (character) =>
                 affectedTiles.has(`${character.X},${character.Y}`) &&
@@ -977,7 +1009,6 @@ ${helpText}
             "(The slime has completely hardened leaving a perfect, sleek statue.",
         );
         for (const character of characters) {
-            character.Appearance.RemoveItem("ClothLower");
             this.replaceItem(
                 character,
                 "ItemLegs",
@@ -985,6 +1016,8 @@ ${helpText}
                 colour,
             );
             character.Appearance.RemoveItem("ItemFeet");
+            character.Appearance.stripBulk({ clothing: true });
+            character.sendAppearanceUpdate();
         }
     }
 
@@ -1141,6 +1174,7 @@ ${helpText}
         for (let index = 0; index < path.length - 1; index++) {
             this.conn.chatRoom.map.setObject(path[index], "Passable");
         }
+        this.drawLosersArea();
     }
 
     private clearBoard(): void {
@@ -1180,6 +1214,7 @@ ${helpText}
         this.gameStartedAt = undefined;
         this.gameEnded = false;
         this.clearDisconnectTimers();
+        this.drawLosersArea();
     }
 
     private clearDisconnectTimers(): void {

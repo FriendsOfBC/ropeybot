@@ -31,8 +31,8 @@ export interface MapRegion {
 function makeBlankMap(type: ChatRoomMapType): ServerChatRoomMapData {
     return {
         Type: type,
-        Tiles: " ".repeat(MAP_WIDTH * MAP_HEIGHT),
-        Objects: " ".repeat(MAP_WIDTH * MAP_HEIGHT),
+        Tiles: "d".repeat(MAP_WIDTH * MAP_HEIGHT),
+        Objects: "d".repeat(MAP_WIDTH * MAP_HEIGHT),
     };
 }
 
@@ -243,6 +243,13 @@ export class API_Map extends EventEmitter<MapEvents> {
         const objID = this.mapData.Objects?.charCodeAt(tileNum);
         const obj = AssetsMapDataObjects.find((o) => o.ID === objID);
         return obj?.Style ?? null;
+    }
+
+    public clearObjects(): void {
+        if (!this.mapData) return;
+
+        this.mapData.Objects = "d".repeat(MAP_WIDTH * MAP_HEIGHT);
+        this.queueUpdate();
     }
 
     public setObject(

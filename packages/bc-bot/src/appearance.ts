@@ -205,6 +205,9 @@ export class AppearanceType {
             }
             return true;
         });
+        this._items = this.data.map(
+            (i) => new API_AppearanceItem(this.character, i),
+        );
 
         return capped;
     }
