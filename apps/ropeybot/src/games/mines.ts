@@ -69,6 +69,8 @@ interface LeaderboardEntry {
     gameTime: number;
 }
 
+const defaultMessage = "Clear the latex mines without setting them off!";
+
 const helpText = `
 💣💣💣💣💣 Sweepymine 💣💣💣💣💣
 
@@ -797,7 +799,7 @@ ${helpText}
                 error,
             );
             this.conn.ChatRoomUpdate({
-                Description: "Clear the latex mines without setting them off!",
+                Description: defaultMessage,
             });
             return;
         }
@@ -815,7 +817,7 @@ ${helpText}
         );
         if (!highestDifficulty) {
             this.conn.ChatRoomUpdate({
-                Description: "Clear the latex mines without setting them off!",
+                Description: defaultMessage,
             });
             return;
         }
