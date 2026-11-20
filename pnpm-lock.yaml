@@ -42,9 +42,9 @@ importers:
         specifier: ^14.2.0
         version: 14.2.0
     devDependencies:
-      '@tsconfig/node24':
-        specifier: ^24.0.0
-        version: 24.0.5
+      '@tsconfig/node26':
+        specifier: ^26.0.0
+        version: 26.0.2
       '@types/lodash':
         specifier: ^4.17.21
         version: 4.17.27
@@ -76,9 +76,9 @@ importers:
         specifier: ^4.8.3
         version: 4.8.4
     devDependencies:
-      '@tsconfig/node24':
-        specifier: ^24.0.0
-        version: 24.0.5
+      '@tsconfig/node26':
+        specifier: ^26.0.0
+        version: 26.0.2
       '@types/node':
         specifier: ^20.19.27
         version: 20.19.43
@@ -256,8 +256,8 @@ packages:
   '@total-typescript/ts-reset@0.6.1':
     resolution: {integrity: sha512-cka47fVSo6lfQDIATYqb/vO1nvFfbPw7uWLayIXIhGETj0wcOOlrlkobOMDNQOFr9QOafegUPq13V2+6vtD7yg==}
 
-  '@tsconfig/node24@24.0.5':
-    resolution: {integrity: sha512-DWC54fGPuhZgg3Ighg4Y/A/bA3ZdB5hnzAuv/MkQ/X85sVsBsMQxu8t7khutdYeiNksBbFdDyeqv1HSW2Zl8aA==}
+  '@tsconfig/node26@26.0.2':
+    resolution: {integrity: sha512-RIBSoNGQxUQ8r4hSrEzS6TrUneoKaCuX6BjL4zF3wqttGq2w06zCea4d8P1gRvM/HZyDT1FQJ8trZSyy/63oMg==}
 
   '@types/lodash@4.17.27':
     resolution: {integrity: sha512-VenMRv/eKNrspX9v3H4dbmjsrnCOYdYBG3kxXKk3dG6X+urBGcj2Prww3xw1U5K4FV/mE4h5GbWd0szEKf+9ew==}
@@ -590,7 +590,7 @@ snapshots:
 
   '@total-typescript/ts-reset@0.6.1': {}
 
-  '@tsconfig/node24@24.0.5': {}
+  '@tsconfig/node26@26.0.2': {}
 
   '@types/lodash@4.17.27': {}
 
