@@ -19,11 +19,7 @@ import {
     ItemPermissionLevel,
     transformToCharacterData,
 } from "./apiCharacter.ts";
-import {
-    API_Chatroom,
-    API_Chatroom_Data,
-    transformToChatRoomData,
-} from "./apiChatroom.ts";
+import { API_Chatroom, transformToChatRoomData } from "./apiChatroom.ts";
 import { Socket } from "socket.io-client";
 import { LogicBase } from "./logicBase.ts";
 import { API_AppearanceItem, BC_AppearanceItem } from "./item.ts";
@@ -43,24 +39,6 @@ export enum LeaveReason {
 }
 
 export type TellType = "Whisper" | "Chat" | "Emote" | "Activity" | "Hidden";
-
-export interface RoomDefinition {
-    Name: string;
-    Description: string;
-    Background: string;
-    Private?: boolean;
-    Locked?: boolean | null;
-    Access: ServerChatRoomRole[];
-    Visibility: ServerChatRoomRole[];
-    Space: ServerChatRoomSpace;
-    Admin: number[];
-    Ban: number[];
-    Limit: number;
-    BlockCategory: ServerChatRoomBlockCategory[];
-    Game: ServerChatRoomGame;
-    Language: ServerChatRoomLanguage;
-    MapData?: ServerChatRoomMapData;
-}
 
 // What the bot advertises as its game version
 const GAMEVERSION = "R134";
@@ -118,7 +96,7 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
     public _chatRoom: API_Chatroom | undefined;
 
     private started = false;
-    private roomJoined: RoomDefinition | undefined;
+    private roomJoined: ServerChatRoomSettings | undefined;
 
     private loggedIn = new PromiseResolve<void>();
     private roomSynced = new PromiseResolve<void>();
@@ -269,7 +247,7 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         }
     }
 
-    public ChatRoomUpdate(update: Partial<API_Chatroom_Data>): void {
+    public ChatRoomUpdate(update: Partial<ServerChatRoomSettings>): void {
         const roomInfo: ServerChatRoomSettings = {
             ...this.roomJoined,
             ...update,
@@ -724,7 +702,9 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         return true;
     }
 
-    public async ChatRoomCreate(roomDef: RoomDefinition): Promise<boolean> {
+    public async ChatRoomCreate(
+        roomDef: ServerChatRoomSettings,
+    ): Promise<boolean> {
         if (this.roomCreatePromise) {
             const result = await this.roomCreatePromise.prom;
             return result === "ChatRoomCreated";
@@ -735,7 +715,7 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         console.log("creating room");
         this.roomCreatePromise = new PromiseResolve();
 
-        const admins = [...roomDef.Admin];
+        const admins = [...(roomDef.Admin ?? [])];
         if (!admins.includes(this._player!.MemberNumber))
             admins.unshift(this._player!.MemberNumber);
         let result;
@@ -764,7 +744,9 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         return true;
     }
 
-    public async joinOrCreateRoom(roomDef: RoomDefinition): Promise<void> {
+    public async joinOrCreateRoom(
+        roomDef: ServerChatRoomSettings,
+    ): Promise<void> {
         await this.loggedIn.prom;
         // store a reference to the current instance of PromiseResolve that was
         // awaited, acting like a session id
@@ -776,9 +758,11 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         // only continue retrying if this joinOrCreateRoom call is still the
         // active login session and isn't one that has disconnected already
         while (logInSession === this.loggedIn) {
-            console.log("Trying to join room...", roomDef);
-            const joinResult = await this.ChatRoomJoin(roomDef.Name);
-            if (joinResult) return;
+            if (roomDef.Name) {
+                console.log("Trying to join room...", roomDef);
+                const joinResult = await this.ChatRoomJoin(roomDef.Name);
+                if (joinResult) return;
+            }
 
             // relinquish responsibility to the actual active login session if this
             // joinOrCreateRoom call is from an old disconnected session

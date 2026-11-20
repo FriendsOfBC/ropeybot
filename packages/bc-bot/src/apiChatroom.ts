@@ -23,29 +23,9 @@ import { API_Map } from "./apiMap.ts";
 import { API_AppearanceItem } from "./item.ts";
 import { API_PlayerCharacter } from "./playerCharacter.ts";
 
-// This should be ServerChatRoomData
-export interface API_Chatroom_Data {
-    Name: string;
-    Description: string;
-    Character: API_Character_Data[];
-    Admin: number[];
-    Ban: number[];
-    Access: ServerChatRoomRole[];
-    Visibility: ServerChatRoomRole[];
-    Limit: number;
-    Background: string;
-    Space: ServerChatRoomSpace;
-    BlockCategory: ServerChatRoomBlockCategory[];
-    Game: ServerChatRoomGame;
-    Language: ServerChatRoomLanguage;
-    MapData?: ServerChatRoomMapData;
-}
-
 export function transformToChatRoomData(
     chatRoom: ServerChatRoomData,
-): API_Chatroom_Data {
-    //@ts-ignore need to remove Private and Locked
-    //FIXME: https://github.com/FriendsOfBC/ropeybot/pull/19/files
+): ServerChatRoomData {
     return {
         ...chatRoom,
         Character: chatRoom.Character.map((data) =>
@@ -72,7 +52,7 @@ export class API_Chatroom extends EventEmitter<ChatRoomEvents> {
     public map: API_Map;
 
     constructor(
-        private data: API_Chatroom_Data,
+        private data: ServerChatRoomData,
         private conn: API_Connector,
         player: API_PlayerCharacter,
     ) {
@@ -154,14 +134,14 @@ export class API_Chatroom extends EventEmitter<ChatRoomEvents> {
     }
 
     // FIXME: this should be private
-    public update(data: Partial<API_Chatroom_Data>) {
+    public update(data: Partial<ServerChatRoomData>) {
         this.data = Object.assign(this.data, structuredClone(data));
         if (data.MapData) {
             this.map.onMapUpdate();
         }
     }
 
-    public ToInfo(): API_Chatroom_Data {
+    public ToInfo(): ServerChatRoomData {
         const info = structuredClone(this.data);
 
         // @ts-expect-error that's wrong, but hey
@@ -204,7 +184,7 @@ export class API_Chatroom extends EventEmitter<ChatRoomEvents> {
         this.characterCache.set(char.MemberNumber, char);
     }
 
-    private characterFromCache(data: API_Character_Data) {
+    private characterFromCache(data: ServerAccountDataSynced) {
         let char = this.characterCache.get(data.MemberNumber);
         if (!char) {
             char = new API_Character(data, this.conn);
@@ -303,6 +283,12 @@ export class API_Chatroom extends EventEmitter<ChatRoomEvents> {
         this.conn.emit("CharacterSync", char);
     }
 
+    /**
+     * An update has arrived from the server for an item on a character
+     * Apply that update to our data model.
+     * 
+     * @param itemUpdate The update information for the character's item
+     */
     public characterItemUpdate(itemUpdate: ServerCharacterItemUpdate) {
         const charObject = this.getCharacter(itemUpdate.Target);
         const charData = this.data.Character.find(
@@ -311,6 +297,13 @@ export class API_Chatroom extends EventEmitter<ChatRoomEvents> {
         if (!charData || !charObject) {
             console.warn(
                 `Trying to update item on member number ${itemUpdate.Target} but can't find them!`,
+            );
+            return;
+        }
+
+        if (!charData.Appearance) {
+            console.warn(
+                `Character with member number ${itemUpdate.Target} has no appearance data!`,
             );
             return;
         }
