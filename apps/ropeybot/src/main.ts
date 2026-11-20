@@ -23,6 +23,7 @@ import { PetSpa } from "./games/petspa";
 import { MaidsPartyNightSinglePlayerAdventure } from "./hub/logic/maidsPartyNightSinglePlayerAdventure";
 import { Casino } from "./games/casino";
 import { Boats } from "./games/boats/boats";
+import { Mines } from "./games/mines";
 
 const SERVER_URL = {
     live: "https://bondage-club-server.herokuapp.com/",
@@ -142,6 +143,13 @@ export async function startBot(): Promise<RopeyBot> {
             const boatsGame = new Boats(connector, config.boats);
             await boatsGame.init();
             connector.setBotDescription(Boats.description);
+            break;
+        case "mines":
+            console.log("Starting game: Mines");
+            connector.accountUpdate({ Nickname: "MineyBot" });
+            const minesGame = new Mines(connector);
+            await minesGame.init();
+            connector.setBotDescription(Mines.description);
             break;
         default:
             console.log("No such game " + config.game);

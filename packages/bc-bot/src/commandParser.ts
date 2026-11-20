@@ -26,21 +26,29 @@ const SLASH_BOT_PREFIX = "ChatRoomBot ";
 
 export class CommandParser {
     private commands = new Map<string, CommandCallback>();
+    private bareCommands = new Map<string, CommandCallback>();
 
     public constructor(private conn: API_Connector) {
         conn.on("Message", this.onMessage);
     }
 
-    public register(cmd: string, cb: CommandCallback) {
+    public register(
+        cmd: string,
+        cb: CommandCallback,
+        allowWithoutPrefix = false,
+    ) {
         this.commands.set(cmd, cb);
+        if (allowWithoutPrefix) this.bareCommands.set(cmd, cb);
     }
 
     public unregister(cmd: string) {
         this.commands.delete(cmd);
+        this.bareCommands.delete(cmd);
     }
 
     public unregisterAll() {
         this.commands.clear();
+        this.bareCommands.clear();
     }
 
     private onMessage = (ev: API_Message) => {
@@ -63,8 +71,35 @@ export class CommandParser {
                 .substring(SLASH_BOT_PREFIX.length)
                 .trimStart();
             this.processCmdString(ev, cmdString);
+        } else if (
+            ["Whisper", "Chat"].includes(ev.message.Type) &&
+            this.bareCommands.has(msg.toLowerCase())
+        ) {
+            this.processCallback(
+                ev,
+                this.bareCommands.get(msg.toLowerCase())!,
+                [],
+            );
         }
     };
+
+    private processCallback(
+        ev: API_Message,
+        callback: CommandCallback,
+        args: string[],
+    ): void {
+        try {
+            const ret = callback(ev.sender, ev.message, args);
+            const promiseRet = ret as Promise<void>;
+            if (promiseRet && promiseRet.catch) {
+                promiseRet.catch((e) => {
+                    console.log("Command handler threw async exception", e);
+                });
+            }
+        } catch (e) {
+            console.log("Command handler threw exception", e);
+        }
+    }
 
     private processCmdString(ev: API_Message, cmdString: string): void {
         const parts = cmdString.toLowerCase().split(" ");
@@ -77,21 +112,7 @@ export class CommandParser {
 
             const cb = this.commands.get(cmd.join(" "));
             if (cb) {
-                try {
-                    const ret = cb(ev.sender, ev.message, parts);
-                    const promiseRet = ret as Promise<void>;
-                    if (promiseRet && promiseRet.catch) {
-                        // I am not sure if a check for promiseRet makes sense but if the return of the command is no promise it would error otherwise
-                        promiseRet.catch((e) => {
-                            console.log(
-                                "Command handler threw async exception",
-                                e,
-                            );
-                        });
-                    }
-                } catch (e) {
-                    console.log("Command handler threw exception", e);
-                }
+                this.processCallback(ev, cb, parts);
                 return;
             }
         }
