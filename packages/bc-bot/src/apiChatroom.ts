@@ -15,24 +15,11 @@
 import { EventEmitter } from "node:events";
 import {
     API_Character,
-    API_Character_Data,
-    transformToCharacterData,
 } from "./apiCharacter.ts";
 import { API_Connector, API_Error } from "./apiConnector.ts";
 import { API_Map } from "./apiMap.ts";
 import { API_AppearanceItem } from "./item.ts";
 import { API_PlayerCharacter } from "./playerCharacter.ts";
-
-export function transformToChatRoomData(
-    chatRoom: ServerChatRoomData,
-): ServerChatRoomData {
-    return {
-        ...chatRoom,
-        Character: chatRoom.Character.map((data) =>
-            transformToCharacterData(data),
-        ),
-    };
-}
 
 interface ChatRoomEvents {
     ItemAdd: [character: API_Character, item: API_AppearanceItem];
@@ -170,7 +157,7 @@ export class API_Chatroom extends EventEmitter<ChatRoomEvents> {
     public findCharacter(specifier: string): API_Character | undefined {
         const nameMatches = this.characters.filter(
             (c) =>
-                c.NickName.toLowerCase() === specifier.toLowerCase() ||
+                c.NickName?.toLowerCase() === specifier.toLowerCase() ||
                 c.Name.toLowerCase() === specifier.toLowerCase(),
         );
         if (nameMatches.length === 1) return nameMatches[0];
@@ -200,7 +187,7 @@ export class API_Chatroom extends EventEmitter<ChatRoomEvents> {
 
     // #endregion
 
-    public memberJoined(member: API_Character_Data) {
+    public memberJoined(member: ServerAccountDataSynced) {
         this.data.Character.push(member);
     }
 
@@ -212,7 +199,7 @@ export class API_Chatroom extends EventEmitter<ChatRoomEvents> {
 
     public characterSync(
         memberNumber: number,
-        charData: API_Character_Data,
+        charData: ServerAccountDataSynced,
         sourceMemberNo: number,
     ) {
         const char = this.getCharacter(memberNumber);

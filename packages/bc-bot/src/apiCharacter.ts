@@ -230,11 +230,25 @@ export class API_Character {
         if (this.ItemPermission >= ItemPermissionLevel.OwnerLover) return false;
 
         // XXX support variants too
-        if (this.data.BlockItems[asset.Group]?.[asset.Name]) {
+        const containsAsset = (permissions: ServerAccountDataSynced["BlockItems"]): boolean => {
+            if (!permissions) return false;
+            if (Array.isArray(permissions)) {
+                return permissions.some(
+                    (item) =>
+                        "Group" in item &&
+                        "Name" in item &&
+                        item.Group === asset.Group &&
+                        item.Name === asset.Name,
+                );
+            }
+            return Boolean(permissions[asset.Group]?.[asset.Name]);
+        };
+
+        if (containsAsset(this.data.BlockItems)) {
             return false;
         }
         if (
-            this.data.LimitedItems[asset.Group]?.[asset.Name] &&
+            containsAsset(this.data.LimitedItems) &&
             !this.WhiteList.includes(this.connection.Player.MemberNumber)
         ) {
             return false;

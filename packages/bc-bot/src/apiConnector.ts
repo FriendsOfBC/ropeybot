@@ -15,11 +15,9 @@
 import { io } from "socket.io-client";
 import {
     API_Character,
-    API_Character_Data,
     ItemPermissionLevel,
-    transformToCharacterData,
 } from "./apiCharacter.ts";
-import { API_Chatroom, transformToChatRoomData } from "./apiChatroom.ts";
+import { API_Chatroom } from "./apiChatroom.ts";
 import { Socket } from "socket.io-client";
 import { LogicBase } from "./logicBase.ts";
 import { API_AppearanceItem, BC_AppearanceItem } from "./item.ts";
@@ -356,7 +354,7 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
                 "Invalid name or password",
             );
         }
-        const charData = resp as unknown as API_Character_Data;
+        const charData = resp;
         this._player = new API_PlayerCharacter(charData, this);
         this.loggedIn.resolve();
     };
@@ -374,27 +372,15 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         console.log("Got chat room update response", resp);
     };
 
-    private onChatRoomSync = (resp: ServerChatRoomSyncMessage) => {
+    private onChatRoomSync = (chatRoom: ServerChatRoomSyncMessage) => {
         //console.log("Got chat room sync", resp);
-        const chatRoom = transformToChatRoomData(resp);
         if (!this._chatRoom) {
             this._chatRoom = new API_Chatroom(chatRoom, this, this._player!);
         } else {
             this._chatRoom.update(chatRoom);
         }
-        const roomData = { ...resp };
-        // @ts-expect-error not part of RoomDefinition
-        delete roomData.Character;
-        // @ts-expect-error not part of RoomDefinition
-        delete roomData.SourceMemberNumber;
-        /** fixes invalid room data on reconnection @see {@link API_Connector.onChatRoomSyncRoomProperties} */
-        // remove these if they're there. The server will have converted to new
-        // Access / Visibility fields and won't accept a ChatRoomCreate with both
-        // Private/Locked and Access/Visibility
-        // @ts-expect-error not part of RoomDefinition
-        delete roomData.Private;
-        // @ts-expect-error not part of RoomDefinition
-        delete roomData.Locked;
+        
+        const { Character, SourceMemberNumber, ...roomData } = chatRoom;
         this.roomJoined = roomData;
         this.roomSynced.resolve();
     };
@@ -406,7 +392,7 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
 
         this.leaveReasons.delete(resp.Character.MemberNumber);
 
-        this._chatRoom!.memberJoined(transformToCharacterData(resp.Character));
+        this._chatRoom!.memberJoined(resp.Character);
 
         const char = this._chatRoom!.getCharacter(resp.Character.MemberNumber);
         if (!char) return;
@@ -481,7 +467,7 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         //console.log("sync character", resp);
         this._chatRoom?.characterSync(
             resp.Character.MemberNumber,
-            transformToCharacterData(resp.Character),
+            resp.Character,
             resp.SourceMemberNumber,
         );
     };
@@ -499,7 +485,7 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         //console.log("sync single", resp);
         this._chatRoom?.characterSync(
             resp.Character.MemberNumber,
-            transformToCharacterData(resp.Character),
+            resp.Character,
             resp.SourceMemberNumber,
         );
     };
@@ -841,7 +827,7 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         this.wrappedSock.emit("ChatRoomCharacterItemUpdate", update);
     }
 
-    public updateCharacter(update: Partial<API_Character_Data>): void {
+    public updateCharacter(update: Partial<ServerAccountDataSynced>): void {
         // console.log("sending ChatRoomCharacterUpdate", JSON.stringify(update));
         this.wrappedSock.emit("ChatRoomCharacterUpdate", update);
     }
@@ -868,7 +854,7 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         return response.AllowItem;
     }
 
-    public accountUpdate(update: Partial<API_Character_Data>): void {
+    public accountUpdate(update: Partial<ServerAccountData>): void {
         //console.log("Sending account update", actualUpdate);
         this.wrappedSock.emit("AccountUpdate", update);
     }
