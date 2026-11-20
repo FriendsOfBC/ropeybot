@@ -23,7 +23,7 @@ import { PetSpa } from "./games/petspa";
 import { MaidsPartyNightSinglePlayerAdventure } from "./hub/logic/maidsPartyNightSinglePlayerAdventure";
 import { Casino } from "./games/casino";
 import { Boats } from "./games/boats/boats";
-import { Mines } from "./games/mines";
+import { Mines } from "./games/mines/mines";
 
 const SERVER_URL = {
     live: "https://bondage-club-server.herokuapp.com/",

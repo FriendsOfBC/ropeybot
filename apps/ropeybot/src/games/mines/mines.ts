@@ -1,3 +1,17 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { readFile, writeFile } from "fs/promises";
 import {
     API_Connector,
@@ -5,8 +19,10 @@ import {
     API_Character,
     BC_Server_ChatRoomMessage,
     AssetGet,
+    colourOutfit,
 } from "bc-bot";
-import { wait } from "../hub/utils";
+import { wait } from "../../hub/utils";
+import { OUTFIT_DOLL1 } from "./doll1";
 
 const BOT_POSITION = { X: 0, Y: 0 };
 const GRID_ORIGIN = { X: 5, Y: 5 };
@@ -991,46 +1007,22 @@ ${helpText}
             "Emote",
             "(Oh no, the slime is starting to harden, tightening into a glossy shell.",
         );
-        for (const character of characters) {
-            this.replaceItem(character, "ItemHood", "DroneMask", colour);
-        }
 
         await wait(5000);
         this.conn.SendMessage(
             "Emote",
             "(Bad news! The slime continues to solidify, squeezing their arms tightly against their body.",
         );
-        for (const character of characters) {
-            this.replaceItem(character, "ItemArms", "StraitLeotard", colour);
-        }
 
         await wait(5000);
         this.conn.SendMessage(
             "Emote",
             "(The slime has completely hardened leaving a perfect, sleek statue.",
         );
-        for (const character of characters) {
-            this.replaceItem(
-                character,
-                "ItemLegs",
-                "SeamlessHobbleSkirt",
-                colour,
-            );
-            character.Appearance.RemoveItem("ItemFeet");
-            character.Appearance.stripBulk({ clothing: true });
-            character.sendAppearanceUpdate();
-        }
-    }
 
-    private replaceItem(
-        character: API_Character,
-        group: AssetGroupName,
-        name: string,
-        colour: HexColor,
-    ): void {
-        const item = character.Appearance.AddItem(AssetGet(group, name));
-        item.SetColor(colour);
-        item.SetDifficulty(10);
+        for (const character of characters) {
+            character.Appearance.slowlyApplyBundle(colourOutfit(OUTFIT_DOLL1, colour, colour));
+        }
     }
 
     private drawLosersArea(): void {
