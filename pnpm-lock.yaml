@@ -7,8 +7,8 @@ settings:
 catalogs:
   default:
     bc-stubs:
-      specifier: 133.0.0
-      version: 133.0.0
+      specifier: 134.0.0
+      version: 134.0.0
     lz-string:
       specifier: 1.5.0
       version: 1.5.0
@@ -28,7 +28,7 @@ importers:
         version: link:../../packages/bc-bot
       bc-stubs:
         specifier: 'catalog:'
-        version: 133.0.0
+        version: 134.0.0
       lodash:
         specifier: ^4.17.21
         version: 4.18.1
@@ -68,7 +68,7 @@ importers:
         version: 3.1.2
       bc-stubs:
         specifier: 'catalog:'
-        version: 133.0.0
+        version: 134.0.0
       lz-string:
         specifier: 'catalog:'
         version: 1.5.0
@@ -474,8 +474,8 @@ packages:
     engines: {node: '>=16.20.0'}
     hasBin: true
 
-  bc-stubs@133.0.0:
-    resolution: {integrity: sha512-Gw3r5igtZy4bOurK0GS9y3akL3MnHUOdKXUuliL9hSqMP0AAL+FGrBuBCWHuDLbc8ql06w1DYbeL8yn2454hRw==}
+  bc-stubs@134.0.0:
+    resolution: {integrity: sha512-v9xLj3ZvNff1F2MujK5x28XMJtkLK9sB2tDicNz+dFK0Gt13a0TDGYWw6r6l+bY7NYcqDv9rCabu3kd/EIKmcA==}
 
   bintrees@1.0.2:
     resolution: {integrity: sha512-VOMgTMwjAaUG580SXn3LacVgjurrbMme7ZZNYGSSV7mmtY6QQRh0Eg3pwIcntQ77DErK1L0NxkbetjcoXzVwKw==}
@@ -880,7 +880,7 @@ snapshots:
       '@typescript/native-preview-win32-arm64': 7.0.0-dev.20260707.2
       '@typescript/native-preview-win32-x64': 7.0.0-dev.20260707.2
 
-  bc-stubs@133.0.0:
+  bc-stubs@134.0.0:
     dependencies:
       '@total-typescript/ts-reset': 0.6.1
       socket.io-client: 4.6.1
