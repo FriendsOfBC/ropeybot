@@ -30,78 +30,6 @@ export enum ItemPermissionLevel {
     OwnerOnly = 5,
 }
 
-export interface API_Character_Data {
-    ID: string;
-    Name: string;
-    Nickname: string;
-    Description: string;
-    Appearance: BC_AppearanceItem[];
-    MemberNumber: number;
-    ActivePose: readonly AssetPoseName[];
-    WhiteList: number[];
-    BlackList: ServerAccountDataSynced["BlackList"];
-    Reputation: NonNullable<ServerAccountDataSynced["Reputation"]>;
-    OnlineSharedSettings: CharacterOnlineSharedSettings;
-    ItemPermission: ItemPermissionLevel;
-    FriendList: number[];
-    MapData?: ChatRoomMapData;
-    BlockItems: ServerItemPermissionsPacked;
-    LimitedItems: ServerItemPermissionsPacked;
-}
-
-export function transformToCharacterData(
-    character: ServerAccountDataSynced,
-): API_Character_Data {
-    const defaultOnlineSettings: CharacterOnlineSharedSettings = {
-        AllowFullWardrobeAccess: false,
-        BlockBodyCosplay: false,
-        AllowPlayerLeashing: false,
-        AllowRename: false,
-        DisablePickingLocksOnSelf: false,
-        GameVersion: "",
-        ItemsAffectExpressions: false,
-        ScriptPermissions: {
-            Hide: {
-                permission: 0,
-            },
-            Block: {
-                permission: 0,
-            },
-        },
-        WheelFortune: "",
-        LockTimerLimit: 0,
-    };
-    let blockItems: ServerItemPermissionsPacked = {};
-    if (Array.isArray(character.BlockItems)) {
-        console.warn("character with unpacked blocked items?");
-    } else {
-        blockItems = character.BlockItems ?? {};
-    }
-    let limitedItems: ServerItemPermissionsPacked = {};
-    if (Array.isArray(character.LimitedItems)) {
-        console.warn("character with unpacked limited items?");
-    } else {
-        limitedItems = character.LimitedItems ?? {};
-    }
-    return {
-        ...character,
-        Reputation: character.Reputation ?? [],
-        Nickname: character.Nickname ?? "",
-        Description: character.Description ?? "",
-        Appearance: character.Appearance ?? [],
-        ActivePose: character.ActivePose ?? [],
-        FriendList:
-            "FriendList" in character ? (character.FriendList as number[]) : [],
-        OnlineSharedSettings: Object.assign(
-            defaultOnlineSettings,
-            character.OnlineSharedSettings,
-        ),
-        MapData: character.MapData,
-        BlockItems: blockItems,
-        LimitedItems: limitedItems,
-    };
-}
-
 export function isNaked(character: API_Character): boolean {
     return (
         character.Appearance.InventoryGet("Cloth") === null &&
@@ -122,7 +50,7 @@ export class API_Character {
     private _appearance: AppearanceType;
 
     constructor(
-        protected readonly data: API_Character_Data,
+        protected readonly data: ServerAccountDataSynced,
         public readonly connection: API_Connector,
     ) {
         this._appearance = new AppearanceType(this, data);
@@ -131,7 +59,7 @@ export class API_Character {
     public get Name(): string {
         return this.data.Name;
     }
-    public get NickName(): string {
+    public get NickName(): string | undefined {
         return this.data.Nickname;
     }
     public get Appearance(): AppearanceType {
@@ -141,14 +69,14 @@ export class API_Character {
         return this.data.MemberNumber;
     }
     public get Pose(): PoseObject[] {
-        return this.data.ActivePose.map((p) => {
+        return this.data?.ActivePose?.map((p) => {
             return { Name: p };
-        });
+        }) ?? [];
     }
-    public get BlackList(): API_Character_Data["BlackList"] {
+    public get BlackList(): MemberNumber[] {
         return this.data.BlackList;
     }
-    public get WhiteList(): number[] {
+    public get WhiteList(): MemberNumber[] {
         return this.data.WhiteList;
     }
     protected manageWhitelist(arg: "add" | "remove", ...members: number[]) {
@@ -179,7 +107,7 @@ export class API_Character {
 
     // #region Other Misc Character Info
     public get Dominance() {
-        if (!this.data.Reputation.length) return 0;
+        if (!this.data?.Reputation?.length) return 0;
         return (
             this.data.Reputation.find((r) => r.Type === "Dominant")?.Value ?? 0
         );
@@ -189,28 +117,51 @@ export class API_Character {
     // #region Online Shared Settings
 
     public get OnlineSharedSettings(): CharacterOnlineSharedSettings {
-        return this.data.OnlineSharedSettings;
+        const defaultOnlineSettings: CharacterOnlineSharedSettings = {
+            AllowFullWardrobeAccess: false,
+            BlockBodyCosplay: false,
+            AllowPlayerLeashing: false,
+            AllowRename: false,
+            DisablePickingLocksOnSelf: false,
+            GameVersion: "",
+            ItemsAffectExpressions: false,
+            ScriptPermissions: {
+                Hide: {
+                    permission: 0,
+                },
+                Block: {
+                    permission: 0,
+                },
+            },
+            WheelFortune: "",
+            LockTimerLimit: 0,
+        };
+
+        return {
+            ...defaultOnlineSettings,
+            ...this.data.OnlineSharedSettings,
+        };
     }
     get allowFullWardrobeAccess(): boolean {
-        return this.data.OnlineSharedSettings.AllowFullWardrobeAccess;
+        return this.OnlineSharedSettings.AllowFullWardrobeAccess;
     }
     get blockBodyCosplay(): boolean {
-        return this.data.OnlineSharedSettings.BlockBodyCosplay;
+        return this.OnlineSharedSettings.BlockBodyCosplay;
     }
     get allowPlayerLeashing(): boolean {
-        return this.data.OnlineSharedSettings.AllowPlayerLeashing;
+        return this.OnlineSharedSettings.AllowPlayerLeashing;
     }
     get allowRename(): boolean {
-        return this.data.OnlineSharedSettings.AllowRename;
+        return this.OnlineSharedSettings.AllowRename;
     }
     get disablePickingLocksOnSelf(): boolean {
-        return this.data.OnlineSharedSettings.DisablePickingLocksOnSelf;
+        return this.OnlineSharedSettings.DisablePickingLocksOnSelf;
     }
     get gameVersion(): string {
-        return this.data.OnlineSharedSettings.GameVersion ?? "";
+        return this.OnlineSharedSettings.GameVersion ?? "";
     }
     get itemsAffectExpressions(): boolean {
-        return this.data.OnlineSharedSettings.ItemsAffectExpressions;
+        return this.OnlineSharedSettings.ItemsAffectExpressions;
     }
     // get WheelFortune(): string {
     //     return this.data.OnlineSharedSettings.WheelFortune;
@@ -219,10 +170,10 @@ export class API_Character {
     public getScriptPermissions(): { hide: boolean; block: boolean } {
         const ret = {
             hide:
-                this.data.OnlineSharedSettings.ScriptPermissions.Hide
+                this.OnlineSharedSettings.ScriptPermissions.Hide
                     .permission !== 0,
             block:
-                this.data.OnlineSharedSettings.ScriptPermissions.Block
+                this.OnlineSharedSettings.ScriptPermissions.Block
                     .permission !== 0,
         };
         return ret;
@@ -448,7 +399,7 @@ export class API_Character {
         });
     }
 
-    public update(data: Partial<API_Character_Data>): void {
+    public update(data: Partial<ServerAccountDataSynced>): void {
         Object.assign(this.data, data);
         this.rebuildAppearance();
     }

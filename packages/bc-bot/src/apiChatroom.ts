@@ -286,7 +286,7 @@ export class API_Chatroom extends EventEmitter<ChatRoomEvents> {
     /**
      * An update has arrived from the server for an item on a character
      * Apply that update to our data model.
-     * 
+     *
      * @param itemUpdate The update information for the character's item
      */
     public characterItemUpdate(itemUpdate: ServerCharacterItemUpdate) {

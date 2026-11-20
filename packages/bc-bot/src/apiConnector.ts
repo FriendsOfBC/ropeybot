@@ -548,7 +548,7 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         this._chatRoom?.characterItemUpdate(update.Item);
         if (update.Item.Target === this._player!.MemberNumber) {
             const payload = {
-                AssetFamily: "Female3DCG",
+                AssetFamily: "Female3DCG" as const,
                 Appearance: this.Player.Appearance.getAppearanceData(),
             };
             this.accountUpdate(payload);
