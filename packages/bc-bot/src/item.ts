@@ -59,7 +59,7 @@ export class API_AppearanceItem {
 
     constructor(
         private character: API_Character,
-        private data: BC_AppearanceItem,
+        private data: ServerItemBundle,
     ) {
         const def = getAssetDef(AssetGet(data.Group, data.Name));
         if (def && def.Extended) {
@@ -191,7 +191,7 @@ export class API_AppearanceItem {
         this.queueUpdate();
     }
 
-    public getData(): BC_AppearanceItem {
+    public getData(): ServerItemBundle {
         return this.data;
     }
 
@@ -209,8 +209,12 @@ export class API_AppearanceItem {
     };
 }
 
-function resolveExtendedAsset(group: AssetGroupName, asset: string) {
+function resolveExtendedAsset(
+    group: AssetGroupName,
+    asset: string,
+): AssetArchetypeConfig | undefined {
     let config = getExtendedAssetDef(AssetGet(group, asset));
+    // Some extended items are defined as just copying others: follow the trail to the end
     while (config && config.CopyConfig) {
         config = getExtendedAssetDef(
             AssetGet(
@@ -227,7 +231,7 @@ export class ExtendedItem {
 
     constructor(
         private itemType: API_AppearanceItem,
-        private item: BC_AppearanceItem,
+        private item: ServerItemBundle,
     ) {
         let config = resolveExtendedAsset(this.item.Group, this.item.Name);
         if (!config) throw new Error();
@@ -235,8 +239,17 @@ export class ExtendedItem {
         //console.log(`Made extended item for ${item.Group} / ${item.Name}, Extended def is ${this.extendedDef}`);
     }
 
-    public get Type() {
-        return this.item.Property?.Type;
+    public get Type(): string | undefined {
+        const typeIndex = this.item.Property?.TypeRecord?.typed;
+        if (
+            typeIndex !== undefined &&
+            this.extendedDef.Archetype == "typed" &&
+            this.extendedDef.Options
+        ) {
+            return this.extendedDef.Options[typeIndex].Name;
+        }
+
+        return undefined;
     }
 
     public SetText(text: string): void {
@@ -328,14 +341,14 @@ export class ExtendedItem {
 export function AssetGet(
     groupName: AssetGroupName,
     assetName: string,
-): BC_AppearanceItem {
+): ServerItemBundle {
     return {
         Group: groupName,
         Name: assetName,
     };
 }
 
-export function getAssetDef(desc: BC_AppearanceItem): AssetDefinition | null {
+export function getAssetDef(desc: ServerItemBundle): AssetDefinition | null {
     const grp = AssetFemale3DCG.find((g) => g.Group === desc.Group);
     if (!grp) {
         // We could add support for the echo slots, but until then, don't spam about them
@@ -355,7 +368,7 @@ export function getAssetDef(desc: BC_AppearanceItem): AssetDefinition | null {
 }
 
 export function getExtendedAssetDef(
-    desc: BC_AppearanceItem,
+    desc: ServerItemBundle,
 ): AssetArchetypeConfig | undefined {
     const grp = AssetFemale3DCGExtended[desc.Group];
     if (!grp) {
@@ -366,6 +379,6 @@ export function getExtendedAssetDef(
     return grp[desc.Name];
 }
 
-function makeAssetType(desc: BC_AppearanceItem) {
+function makeAssetType(desc: ServerItemBundle) {
     return new AssetType(getAssetDef(desc) as unknown as Asset);
 }
