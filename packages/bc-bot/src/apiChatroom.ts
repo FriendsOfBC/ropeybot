@@ -13,9 +13,7 @@
  */
 
 import { EventEmitter } from "node:events";
-import {
-    API_Character,
-} from "./apiCharacter.ts";
+import { API_Character } from "./apiCharacter.ts";
 import { API_Connector, API_Error } from "./apiConnector.ts";
 import { API_Map } from "./apiMap.ts";
 import { API_AppearanceItem } from "./item.ts";

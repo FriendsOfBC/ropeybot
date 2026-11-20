@@ -13,10 +13,7 @@
  */
 
 import { io } from "socket.io-client";
-import {
-    API_Character,
-    ItemPermissionLevel,
-} from "./apiCharacter.ts";
+import { API_Character, ItemPermissionLevel } from "./apiCharacter.ts";
 import { API_Chatroom } from "./apiChatroom.ts";
 import { Socket } from "socket.io-client";
 import { LogicBase } from "./logicBase.ts";
@@ -379,7 +376,7 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
         } else {
             this._chatRoom.update(chatRoom);
         }
-        
+
         const { Character, SourceMemberNumber, ...roomData } = chatRoom;
         this.roomJoined = roomData;
         this.roomSynced.resolve();

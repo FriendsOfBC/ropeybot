@@ -52,8 +52,9 @@ export class API_PlayerCharacter extends API_Character {
         this.OnlineSharedSettings.ScriptPermissions.Hide.permission = hide
             ? 1
             : 0;
-        this.OnlineSharedSettings.ScriptPermissions.Block.permission =
-            block ? 1 : 0;
+        this.OnlineSharedSettings.ScriptPermissions.Block.permission = block
+            ? 1
+            : 0;
         this.updateOnlineSharedSettings();
     }
 

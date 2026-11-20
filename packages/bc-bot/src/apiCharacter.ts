@@ -69,9 +69,11 @@ export class API_Character {
         return this.data.MemberNumber;
     }
     public get Pose(): PoseObject[] {
-        return this.data?.ActivePose?.map((p) => {
-            return { Name: p };
-        }) ?? [];
+        return (
+            this.data?.ActivePose?.map((p) => {
+                return { Name: p };
+            }) ?? []
+        );
     }
     public get BlackList(): MemberNumber[] {
         return this.data.BlackList;
@@ -170,11 +172,11 @@ export class API_Character {
     public getScriptPermissions(): { hide: boolean; block: boolean } {
         const ret = {
             hide:
-                this.OnlineSharedSettings.ScriptPermissions.Hide
-                    .permission !== 0,
+                this.OnlineSharedSettings.ScriptPermissions.Hide.permission !==
+                0,
             block:
-                this.OnlineSharedSettings.ScriptPermissions.Block
-                    .permission !== 0,
+                this.OnlineSharedSettings.ScriptPermissions.Block.permission !==
+                0,
         };
         return ret;
     }
@@ -230,7 +232,9 @@ export class API_Character {
         if (this.ItemPermission >= ItemPermissionLevel.OwnerLover) return false;
 
         // XXX support variants too
-        const containsAsset = (permissions: ServerAccountDataSynced["BlockItems"]): boolean => {
+        const containsAsset = (
+            permissions: ServerAccountDataSynced["BlockItems"],
+        ): boolean => {
             if (!permissions) return false;
             if (Array.isArray(permissions)) {
                 return permissions.some(
