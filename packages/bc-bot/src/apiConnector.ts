@@ -55,7 +55,7 @@ export interface RoomDefinition {
     Space: ServerChatRoomSpace;
     Admin: number[];
     Ban: number[];
-    Limit: number | string;
+    Limit: number;
     BlockCategory: ServerChatRoomBlockCategory[];
     Game: ServerChatRoomGame;
     Language: ServerChatRoomLanguage;
@@ -270,7 +270,10 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
     }
 
     public ChatRoomUpdate(update: Partial<API_Chatroom_Data>): void {
-        const roomInfo: ServerChatRoomSettings = structuredClone(update);
+        const roomInfo: ServerChatRoomSettings = {
+            ...this.roomJoined,
+            ...update,
+        };
         // @ts-expect-error We make a copy but remove the keys that aren't necessary
         delete roomInfo.Character;
         const payload: ServerChatRoomAdminUpdateRequest = {

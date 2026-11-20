@@ -20,9 +20,20 @@ import { EventEmitter } from "node:events";
 import { MapTextUtil } from "./mapText.ts";
 import { AssetsMapDataObjects, AssetsMapDataTiles } from "./bcdata/MapData.js";
 
+const MAP_WIDTH = 40;
+const MAP_HEIGHT = 40;
+
 export interface MapRegion {
     TopLeft: ChatRoomMapPos;
     BottomRight: ChatRoomMapPos;
+}
+
+function makeBlankMap(type: ChatRoomMapType): ServerChatRoomMapData {
+    return {
+        Type: type,
+        Tiles: "d".repeat(MAP_WIDTH * MAP_HEIGHT),
+        Objects: "d".repeat(MAP_WIDTH * MAP_HEIGHT),
+    };
 }
 
 function mapTileByNameAndType(
@@ -41,12 +52,14 @@ function mapTileByNameAndType(
 function mapObjectByNameAndType(
     name: string,
     type?: ChatRoomMapObjectType,
+    rotation?: number,
 ): ChatRoomMapObject | null {
     return (
         AssetsMapDataObjects.find(
             (tile) =>
                 (type === undefined || tile.Type === type) &&
-                tile.Style === name,
+                tile.Style === name &&
+                (rotation === undefined || (tile.Rotation ?? 0) === rotation),
         ) ?? null
     );
 }
@@ -132,6 +145,29 @@ export class API_Map extends EventEmitter<MapEvents> {
         this.roomData.MapData = data;
     }
 
+    public mapType(): ChatRoomMapType {
+        return this.mapData?.Type ?? "Never";
+    }
+
+    public setMapType(type: ChatRoomMapType): void {
+        if (!this.mapData) {
+            this.mapData = makeBlankMap(type);
+        } else {
+            this.mapData.Type = type;
+        }
+        this.queueUpdate();
+    }
+
+    public fogEnabled(): boolean {
+        return this.mapData?.Fog ?? false;
+    }
+
+    public setFogEnabled(enabled: boolean): void {
+        if (!this.mapData) return;
+        this.mapData.Fog = enabled;
+        this.queueUpdate();
+    }
+
     public addTileTrigger(
         where: ChatRoomMapPos,
         callback: TriggerCallback,
@@ -196,6 +232,7 @@ export class API_Map extends EventEmitter<MapEvents> {
         tileType?: ChatRoomMapTileType,
     ): void {
         if (!this.mapData) return;
+        if (!this.mapData.Tiles) this.mapData.Tiles = "";
 
         const tile = mapTileByNameAndType(tileName, tileType);
         if (!tile) return;
@@ -218,14 +255,23 @@ export class API_Map extends EventEmitter<MapEvents> {
         return obj?.Style ?? null;
     }
 
+    public clearObjects(): void {
+        if (!this.mapData) return;
+
+        this.mapData.Objects = "d".repeat(MAP_WIDTH * MAP_HEIGHT);
+        this.queueUpdate();
+    }
+
     public setObject(
         pos: ChatRoomMapPos,
         objectName: string,
         objectType?: ChatRoomMapObjectType,
+        rotation?: number,
     ): void {
         if (!this.mapData) return;
+        if (!this.mapData.Objects) this.mapData.Objects = "";
 
-        const tile = mapObjectByNameAndType(objectName, objectType);
+        const tile = mapObjectByNameAndType(objectName, objectType, rotation);
         if (!tile) return;
 
         const tileNum = pos.X + pos.Y * 40;
