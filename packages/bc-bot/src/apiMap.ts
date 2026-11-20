@@ -158,6 +158,16 @@ export class API_Map extends EventEmitter<MapEvents> {
         this.queueUpdate();
     }
 
+    public fogEnabled(): boolean {
+        return this.mapData?.Fog ?? false;
+    }
+
+    public setFogEnabled(enabled: boolean): void {
+        if (!this.mapData) return;
+        this.mapData.Fog = enabled;
+        this.queueUpdate();
+    }
+
     public addTileTrigger(
         where: ChatRoomMapPos,
         callback: TriggerCallback,

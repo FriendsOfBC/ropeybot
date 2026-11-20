@@ -236,6 +236,7 @@ ${helpText}
 
     private generateMap(): void {
         this.conn.chatRoom.map.clearObjects();
+        this.conn.chatRoom.map.setFogEnabled(true);
 
         // Create 30x20 area enclosed by walls
         // Walls around the grid
