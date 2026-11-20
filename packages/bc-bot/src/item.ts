@@ -209,7 +209,10 @@ export class API_AppearanceItem {
     };
 }
 
-function resolveExtendedAsset(group: AssetGroupName, asset: string): AssetArchetypeConfig | undefined {
+function resolveExtendedAsset(
+    group: AssetGroupName,
+    asset: string,
+): AssetArchetypeConfig | undefined {
     let config = getExtendedAssetDef(AssetGet(group, asset));
     // Some extended items are defined as just copying others: follow the trail to the end
     while (config && config.CopyConfig) {
@@ -238,7 +241,11 @@ export class ExtendedItem {
 
     public get Type(): string | undefined {
         const typeIndex = this.item.Property?.TypeRecord?.typed;
-        if (typeIndex !== undefined && this.extendedDef.Archetype == "typed" && this.extendedDef.Options) {
+        if (
+            typeIndex !== undefined &&
+            this.extendedDef.Archetype == "typed" &&
+            this.extendedDef.Options
+        ) {
             return this.extendedDef.Options[typeIndex].Name;
         }
 
