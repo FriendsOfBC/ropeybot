@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { API_Character, API_Character_Data } from "./apiCharacter.ts";
+import { API_Character } from "./apiCharacter.ts";
 import { isBind, isBody, isClothing, isCosplay } from "./assetHelpers.ts";
 import { wait } from "./util/wait.ts";
 import { API_AppearanceItem, BC_AppearanceItem } from "./item.ts";
@@ -123,17 +123,17 @@ export class AppearanceType {
 
     constructor(
         private readonly character: API_Character,
-        private readonly charData: API_Character_Data,
+        private readonly charData: ServerAccountDataSynced,
     ) {
         this._items = this.data.map(
             (i) => new API_AppearanceItem(character, i),
         );
     }
 
-    private get data(): BC_AppearanceItem[] {
-        return this.charData.Appearance;
+    private get data(): ServerItemBundle[] {
+        return this.charData.Appearance ?? [];
     }
-    private set data(d: BC_AppearanceItem[]) {
+    private set data(d: ServerItemBundle[]) {
         this.charData.Appearance = d;
     }
 
@@ -141,7 +141,7 @@ export class AppearanceType {
         return this._items;
     }
 
-    public getAppearanceData(): BC_AppearanceItem[] {
+    public getAppearanceData(): ServerItemBundle[] {
         return this.data;
     }
 

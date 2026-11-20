@@ -1,10 +1,10 @@
-import { API_Character, API_Character_Data } from "./apiCharacter.ts";
+import { API_Character } from "./apiCharacter.ts";
 import { API_Connector } from "./apiConnector.ts";
 import { BC_AppearanceItem } from "./item.ts";
 
 export class API_PlayerCharacter extends API_Character {
     constructor(
-        protected data: API_Character_Data,
+        protected data: ServerAccountData,
         connection: API_Connector,
     ) {
         super(data, connection);
@@ -19,41 +19,42 @@ export class API_PlayerCharacter extends API_Character {
     }
 
     set allowFullWardrobeAccess(value: boolean) {
-        this.data.OnlineSharedSettings.AllowFullWardrobeAccess = value;
+        this.OnlineSharedSettings.AllowFullWardrobeAccess = value;
         this.updateOnlineSharedSettings();
     }
 
     set blockBodyCosplay(value: boolean) {
-        this.data.OnlineSharedSettings.BlockBodyCosplay = value;
+        this.OnlineSharedSettings.BlockBodyCosplay = value;
         this.updateOnlineSharedSettings();
     }
 
     set allowPlayerLeashing(value: boolean) {
-        this.data.OnlineSharedSettings.AllowPlayerLeashing = value;
+        this.OnlineSharedSettings.AllowPlayerLeashing = value;
         this.updateOnlineSharedSettings();
     }
 
     set allowRename(value: boolean) {
-        this.data.OnlineSharedSettings.AllowRename = value;
+        this.OnlineSharedSettings.AllowRename = value;
         this.updateOnlineSharedSettings();
     }
 
     set disablePickingLocksOnSelf(value: boolean) {
-        this.data.OnlineSharedSettings.DisablePickingLocksOnSelf = value;
+        this.OnlineSharedSettings.DisablePickingLocksOnSelf = value;
         this.updateOnlineSharedSettings();
     }
 
     set itemsAffectExpressions(value: boolean) {
-        this.data.OnlineSharedSettings.ItemsAffectExpressions = value;
+        this.OnlineSharedSettings.ItemsAffectExpressions = value;
         this.updateOnlineSharedSettings();
     }
 
     public setScriptPermissions(hide: boolean, block: boolean): void {
-        this.data.OnlineSharedSettings.ScriptPermissions.Hide.permission = hide
+        this.OnlineSharedSettings.ScriptPermissions.Hide.permission = hide
             ? 1
             : 0;
-        this.data.OnlineSharedSettings.ScriptPermissions.Block.permission =
-            block ? 1 : 0;
+        this.OnlineSharedSettings.ScriptPermissions.Block.permission = block
+            ? 1
+            : 0;
         this.updateOnlineSharedSettings();
     }
 

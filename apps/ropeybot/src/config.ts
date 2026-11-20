@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-import { type RoomDefinition } from "bc-bot";
 import { type CasinoConfig } from "./games/casino";
 import { type BoatsConfig } from "./games/boats/boats";
 
@@ -23,7 +22,7 @@ export interface ConfigFile {
     url?: string;
     game: string;
     superusers: number[];
-    room: RoomDefinition;
+    room: ServerChatRoomSettings;
     mongo_uri?: string;
     mongo_db?: string;
     members: number[];

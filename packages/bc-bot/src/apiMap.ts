@@ -14,7 +14,6 @@
 
 import lzString from "lz-string";
 import { API_Character } from "./apiCharacter.ts";
-import { API_Chatroom_Data } from "./apiChatroom.ts";
 import { API_Connector } from "./apiConnector.ts";
 import { EventEmitter } from "node:events";
 import { MapTextUtil } from "./mapText.ts";
@@ -120,7 +119,7 @@ export class API_Map extends EventEmitter<MapEvents> {
 
     constructor(
         private conn: API_Connector,
-        private roomData: API_Chatroom_Data,
+        private roomData: ServerChatRoomData,
     ) {
         super();
     }
