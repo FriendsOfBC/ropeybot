@@ -6,6 +6,9 @@ settings:
 
 catalogs:
   default:
+    '@typescript/native-preview':
+      specifier: 7.0.0-dev.20260707.2
+      version: 7.0.0-dev.20260707.2
     bc-stubs:
       specifier: 134.0.0
       version: 134.0.0
@@ -51,15 +54,15 @@ importers:
       '@types/node':
         specifier: ^20.19.27
         version: 20.19.43
+      '@typescript/native-preview':
+        specifier: 'catalog:'
+        version: 7.0.0-dev.20260707.2
       esbuild:
         specifier: ^0.28.0
         version: 0.28.2
       tsx:
         specifier: ^4.21.0
         version: 4.23.15
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
 
   packages/bc-bot:
     dependencies:
@@ -454,11 +457,6 @@ packages:
     engines: {node: '>=18.0.0'}
     hasBin: true
 
-  typescript@5.9.3:
-    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
-    engines: {node: '>=14.17'}
-    hasBin: true
-
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
 
@@ -789,8 +787,6 @@ snapshots:
       esbuild: 0.28.2
     optionalDependencies:
       fsevents: 2.3.3
-
-  typescript@5.9.3: {}
 
   undici-types@6.21.0: {}
 
