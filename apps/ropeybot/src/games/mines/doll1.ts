@@ -97,7 +97,14 @@ export const OUTFIT_DOLL1: ServerItemBundle[] = [
         Group: "ItemArms",
         Name: "ShinyStraitjacket",
         Difficulty: 30,
-        Color: ["#FF00FF", "Default", "#FFFFFF", "Default", "Default", "Default"],
+        Color: [
+            "#FF00FF",
+            "Default",
+            "#FFFFFF",
+            "Default",
+            "Default",
+            "Default",
+        ],
         Property: {
             TypeRecord: {
                 typed: 2,
