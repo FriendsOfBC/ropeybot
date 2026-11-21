@@ -882,10 +882,7 @@ ${helpText}
         this.clearDisconnectTimers();
         await this.updateRoomDescription();
         this.revealMineResults();
-        await this.explodeAt(
-            position,
-            this.activePlayerName ?? "the player",
-        );
+        await this.explodeAt(position, this.activePlayerName ?? "the player");
     }
 
     private async explodeAt(
@@ -1007,7 +1004,9 @@ ${helpText}
         for (const character of characters) {
             character.Appearance.stripBulk({ clothing: true });
             await character.sendAppearanceUpdate();
-            await character.Appearance.slowlyApplyBundle(colourOutfit(OUTFIT_DOLL1, colour, colour));
+            await character.Appearance.slowlyApplyBundle(
+                colourOutfit(OUTFIT_DOLL1, colour, colour),
+            );
             await wait(300);
             character.Appearance.RemoveItem("ItemLegs");
             await wait(300);
