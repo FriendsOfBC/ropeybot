@@ -299,7 +299,6 @@ ${helpText}
 
         this.clearBoard();
         this.drawIdleTitle();
-        this.drawLosersArea();
     }
 
     onStart = async (
@@ -508,7 +507,7 @@ ${helpText}
             "Emote",
             `(In recognition of your achievement, please accept one of our premium quality latex mines. Enjoy! Love, Ellie xxxx`,
         );
-        await this.explodeAt(sender.MapPos, sender.Name, "winners");
+        await this.explodeAt(sender.MapPos, sender.Name);
         const wipes = sender.Appearance.AddItem(
             AssetGet("ItemHandheld", "Wipes"),
         );
@@ -886,19 +885,16 @@ ${helpText}
         await this.explodeAt(
             position,
             this.activePlayerName ?? "the player",
-            "losers",
         );
     }
 
     private async explodeAt(
         position: ChatRoomMapPos,
         playerName: string,
-        conveyTo: "losers" | "winners" | undefined,
     ): Promise<void> {
         const slime =
             SLIME_FLOORS[Math.floor(Math.random() * SLIME_FLOORS.length)];
         const affectedTiles = this.drawExplosion(position, slime.tile);
-        this.drawLosersArea();
         const affectedPlayers = this.conn.chatRoom.characters.filter(
             (character) =>
                 affectedTiles.has(`${character.X},${character.Y}`) &&
@@ -914,18 +910,6 @@ ${helpText}
             ),
         );
         await this.hardenSlime(affectedPlayers, slime.itemColour);
-        await wait(5000);
-        if (conveyTo) {
-            await this.conveyPlayers(affectedPlayers, conveyTo);
-        }
-
-        for (const character of affectedPlayers) {
-            const glue = character.Appearance.AddItem(
-                AssetGet("ItemDevices", "GlueFloor"),
-            );
-            glue.SetDifficulty(10);
-            glue.SetColor(slime.itemColour);
-        }
     }
 
     private revealMineResults(): void {
@@ -1021,76 +1005,14 @@ ${helpText}
         );
 
         for (const character of characters) {
-            character.Appearance.slowlyApplyBundle(colourOutfit(OUTFIT_DOLL1, colour, colour));
+            character.Appearance.stripBulk({ clothing: true });
+            await character.sendAppearanceUpdate();
+            await character.Appearance.slowlyApplyBundle(colourOutfit(OUTFIT_DOLL1, colour, colour));
+            await wait(300);
+            character.Appearance.RemoveItem("ItemLegs");
+            await wait(300);
+            character.Appearance.RemoveItem("ItemFeet");
         }
-    }
-
-    private drawLosersArea(): void {
-        for (
-            let x = LOSERS_AREA.X;
-            x < LOSERS_AREA.X + LOSERS_AREA.width;
-            x++
-        ) {
-            this.conn.chatRoom.map.setTile(
-                { X: x, Y: LOSERS_AREA.Y },
-                "CarpetRed2",
-                "Floor",
-            );
-        }
-        this.conn.chatRoom.map.writeText(
-            { X: LOSERS_AREA.X, Y: LOSERS_AREA.Y },
-            "LOSERS",
-            LOSERS_AREA.width,
-        );
-    }
-
-    private async conveyPlayers(
-        characters: API_Character[],
-        destinationArea: "losers" | "winners",
-    ): Promise<void> {
-        const area = destinationArea === "losers" ? LOSERS_AREA : WINNERS_AREA;
-        const reserved = new Set(
-            this.conn.chatRoom.characters
-                .filter((character) =>
-                    this.positionIsInArea(character.MapPos, area),
-                )
-                .map((character) => `${character.X},${character.Y}`),
-        );
-
-        for (const character of characters) {
-            const destination = this.findFreeAreaSquare(area, reserved);
-            if (!destination) {
-                break;
-            }
-            reserved.add(`${destination.X},${destination.Y}`);
-            const path = this.findConveyorPath(character.MapPos, destination);
-            if (path.length < 2) {
-                continue;
-            }
-
-            this.conn.SendMessage(
-                "Emote",
-                `(${character.Name} is being conveyed to the ${destinationArea === "losers" ? "loser's" : "special winner's"} area.`,
-            );
-            this.drawConveyorPath(path);
-            character.mapTeleport(path[1]);
-            await wait((path.length - 1) * 600);
-            character.mapTeleport(destination);
-            this.clearConveyorPath(path);
-        }
-    }
-
-    private findFreeAreaSquare(
-        area: { X: number; Y: number; width: number },
-        reserved: Set<string>,
-    ): ChatRoomMapPos | undefined {
-        for (let x = area.X; x < area.X + area.width; x++) {
-            const position = { X: x, Y: area.Y };
-            if (!reserved.has(`${position.X},${position.Y}`)) {
-                return position;
-            }
-        }
-        return undefined;
     }
 
     private positionIsInArea(
@@ -1145,31 +1067,6 @@ ${helpText}
         return [];
     }
 
-    private drawConveyorPath(path: ChatRoomMapPos[]): void {
-        for (let index = 0; index < path.length - 1; index++) {
-            const current = path[index];
-            const next = path[index + 1];
-            let rotation = 0;
-            if (next.X > current.X) rotation = 180;
-            else if (next.Y > current.Y) rotation = 270;
-            else if (next.Y < current.Y) rotation = 90;
-
-            this.conn.chatRoom.map.setObject(
-                current,
-                "ConveyorBelt1",
-                "Functional",
-                rotation,
-            );
-        }
-    }
-
-    private clearConveyorPath(path: ChatRoomMapPos[]): void {
-        for (let index = 0; index < path.length - 1; index++) {
-            this.conn.chatRoom.map.setObject(path[index], "Passable");
-        }
-        this.drawLosersArea();
-    }
-
     private clearBoard(): void {
         for (const position of this.victoryBalloonPositions) {
             const [x, y] = position.split(",").map(Number);
@@ -1207,7 +1104,6 @@ ${helpText}
         this.gameStartedAt = undefined;
         this.gameEnded = false;
         this.clearDisconnectTimers();
-        this.drawLosersArea();
     }
 
     private clearDisconnectTimers(): void {
