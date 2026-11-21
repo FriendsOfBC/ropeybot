@@ -187,7 +187,7 @@ ${helpText}
             "Whisper",
             this.activePlayerName
                 ? `( A game is currently in progress. ${this.activePlayerName} is playing. )`
-                : "( Let's play Sweepymine! Can you clear all the latex bombs? Careful: set one off and you'll be a beautiful latex statue! " +
+                : "( Let's play Sweepymine! Can you clear all the latex bombs? Careful not to set one off: the latex dries very fast! " +
                       "Use !start easy, !start medium, or !start hard to start a game.",
         );
     };
@@ -986,7 +986,7 @@ ${helpText}
         await wait(5000);
         this.conn.SendMessage(
             "Emote",
-            "(Oh no, the slime is starting to harden, tightening into a glossy shell.",
+            "(Oh no, the slime is starting to harden, tightening and shrinking around its victim.",
         );
 
         await wait(5000);
@@ -998,7 +998,7 @@ ${helpText}
         await wait(5000);
         this.conn.SendMessage(
             "Emote",
-            "(The slime has completely hardened leaving a perfect, sleek statue.",
+            "(The slime has completely hardened leaving a perfect, sleek skin.",
         );
 
         for (const character of characters) {
