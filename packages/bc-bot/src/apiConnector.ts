@@ -82,8 +82,8 @@ interface ConnectorEvents {
 }
 
 export class API_Connector extends EventEmitter<ConnectorEvents> {
-    private sock: Socket<ServerToClientEvents, ClientToServerEvents>;
-    private wrappedSock: SocketWrapper<
+    private readonly sock: Socket<ServerToClientEvents, ClientToServerEvents>;
+    private readonly wrappedSock: SocketWrapper<
         ServerToClientEvents,
         ClientToServerEvents
     >;

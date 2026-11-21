@@ -30,15 +30,15 @@ interface ChatRoomEvents {
 }
 
 export class API_Chatroom extends EventEmitter<ChatRoomEvents> {
-    private characterCache = new Map<number, API_Character>();
+    private readonly characterCache = new Map<number, API_Character>();
 
-    private reorderWatcher = new EventEmitter();
+    private readonly reorderWatcher = new EventEmitter();
 
     public map: API_Map;
 
     constructor(
-        private data: ServerChatRoomData,
-        private conn: API_Connector,
+        private readonly data: ServerChatRoomData,
+        private readonly conn: API_Connector,
         player: API_PlayerCharacter,
     ) {
         super();
@@ -120,7 +120,7 @@ export class API_Chatroom extends EventEmitter<ChatRoomEvents> {
 
     // FIXME: this should be private
     public update(data: Partial<ServerChatRoomData>) {
-        this.data = Object.assign(this.data, structuredClone(data));
+        Object.assign(this.data, structuredClone(data));
         if (data.MapData) {
             this.map.onMapUpdate();
         }

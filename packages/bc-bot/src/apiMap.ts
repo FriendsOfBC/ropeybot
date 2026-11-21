@@ -118,8 +118,8 @@ export class API_Map extends EventEmitter<MapEvents> {
     private leaveRegionTriggers: RegionTrigger[] = [];
 
     constructor(
-        private conn: API_Connector,
-        private roomData: ServerChatRoomData,
+        private readonly conn: API_Connector,
+        private readonly roomData: ServerChatRoomData,
     ) {
         super();
     }
