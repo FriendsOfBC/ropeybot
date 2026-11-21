@@ -95,9 +95,14 @@ export const OUTFIT_DOLL1: ServerItemBundle[] = [
     },
     {
         Group: "ItemArms",
-        Name: "ShinyArmbinder",
+        Name: "ShinyStraitjacket",
         Difficulty: 30,
-        Color: ["#FF00FF", "Default", "Default", "Default"],
+        Color: ["#FF00FF", "Default", "#FFFFFF", "Default", "Default", "Default"],
+        Property: {
+            TypeRecord: {
+                typed: 2,
+            },
+        },
         Craft: {
             Name: "Sweepymine Patented InstaDry Latex",
             Description:
@@ -110,7 +115,7 @@ export const OUTFIT_DOLL1: ServerItemBundle[] = [
     },
     {
         Group: "ItemLegs",
-        Name: "ShinyLegbinder",
+        Name: "ShinyLegBinder",
         Difficulty: 30,
         Color: ["#FF00FF", "Default", "Default", "Default"],
         Property: {

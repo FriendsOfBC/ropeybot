@@ -402,7 +402,7 @@ export class API_Character {
         this.connection.updateCharacterItem({
             Target: this.MemberNumber,
             Group: data.Group,
-            Name: item ? item.Name : null,
+            Name: item ? item.Name : undefined,
             Color: item?.Color != null ? item.Color : "Default",
             Difficulty: data.Difficulty ?? 0,
             Property: item?.Property ? item.Property : undefined,
