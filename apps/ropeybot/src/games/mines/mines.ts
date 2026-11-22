@@ -245,7 +245,6 @@ ${helpText}
     private setupRoom = async () => {
         this.conn.chatRoom.useMap(true);
         this.generateMap();
-        await wait(200);
         this.conn.moveOnMap(BOT_POSITION.X, BOT_POSITION.Y);
         await this.updateRoomDescription();
     };
@@ -335,7 +334,6 @@ ${helpText}
             `(The board is set, ${sender.toString()}. Use !sweep to reveal a square and !flag to mark a mine ('s' and 'f' also work). Be careful: set off a mine and you'll be stuck.`,
         );
 
-        await wait(1000);
         await this.updateRoomDescription();
     };
 

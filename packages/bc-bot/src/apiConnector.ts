@@ -243,10 +243,12 @@ export class API_Connector extends EventEmitter<ConnectorEvents> {
     }
 
     public ChatRoomUpdate(update: Partial<ServerChatRoomSettings>): void {
-        const roomInfo: ServerChatRoomSettings = {
-            ...this.roomJoined,
-            ...update,
-        };
+        // asign back to our copy so if any more updates come in, we won't
+        // overwrite the previous updates
+        this.roomJoined = Object.assign(this.roomJoined ?? {}, update);
+
+        // copy back to an object so we can delete the character
+        const roomInfo = structuredClone(this.roomJoined);
         // @ts-expect-error We make a copy but remove the keys that aren't necessary
         delete roomInfo.Character;
         const payload: ServerChatRoomAdminUpdateRequest = {

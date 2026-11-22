@@ -16,7 +16,7 @@
     "scripts": {
         "types": "tsgo --noEmit",
         "prepare": "pnpm build",
-        "build": "rm -rf dist/* && tsgo"
+        "build": "rm -rf dist/* && tsgo --sourceMap"
     },
     "dependencies": {
         "@socket.io/component-emitter": "^3.1.2",
