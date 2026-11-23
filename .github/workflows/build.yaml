@@ -17,7 +17,7 @@ jobs:
         steps:
             - uses: pnpm/action-setup@v2
               with:
-                  version: 10
+                  version: 12
 
             - name: Checkout
               uses: actions/checkout@v4
